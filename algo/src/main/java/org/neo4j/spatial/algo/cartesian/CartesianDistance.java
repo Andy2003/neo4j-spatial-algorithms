@@ -10,17 +10,17 @@ import org.neo4j.spatial.core.Point;
 import org.neo4j.spatial.core.Polygon;
 import org.neo4j.spatial.core.Polyline;
 
-import static java.lang.String.format;
-
 public class CartesianDistance extends Distance {
     public double distance(Polygon a, Polygon b) {
         debug("Calculating cartesian distance");
         boolean intersects = new CartesianMCSweepLineIntersect().doesIntersect(a, b);
 
         //Check if one polygon is (partially) contained by the other
-        if (intersects) {
-            return 0;
-        } else  if (CartesianWithin.within(a, b.getShells()[0].getPoints()[0]) || CartesianWithin.within(b, a.getShells()[0].getPoints()[0])) {
+        if (intersects
+                || CartesianWithin.within(a, b.getShells()[0].getPoints()[0])
+                || CartesianWithin.within(b, a.getShells()[0].getPoints()[0])
+        )
+        {
             return 0;
         }
 
@@ -47,9 +47,7 @@ public class CartesianDistance extends Distance {
         boolean intersects = new CartesianMCSweepLineIntersect().doesIntersect(polygon, multiPolyline);
 
         //Check if the multi polyline is (partially) contained by the polygon
-        if (intersects) {
-            return 0;
-        } else  if (CartesianWithin.within(polygon, multiPolyline.getChildren()[0].getPoints()[0])) {
+        if (intersects || CartesianWithin.within(polygon, multiPolyline.getChildren()[0].getPoints()[0])) {
             return 0;
         }
 
@@ -64,9 +62,7 @@ public class CartesianDistance extends Distance {
         boolean intersects = new CartesianMCSweepLineIntersect().doesIntersect(polygon, polyline);
 
         //Check if the polyline is (partially) contained by the polygon
-        if (intersects) {
-            return 0;
-        } else  if (CartesianWithin.within(polygon, polyline.getPoints()[0])) {
+        if (intersects || CartesianWithin.within(polygon, polyline.getPoints()[0])) {
             return 0;
         }
 
@@ -210,7 +206,7 @@ public class CartesianDistance extends Distance {
         double dotProduct = AlgoUtil.dotProduct(a, b);
         double lengthSquared = a[0] * a[0] + a[1] * a[1];
 
-        double t = Math.max(0, Math.min(1, dotProduct/lengthSquared));
+        double t = Math.max(0, Math.min(1, dotProduct / lengthSquared));
 
         Point projection = v.subtract(u.getCoordinate()).multiply(t).add(u.getCoordinate());
 

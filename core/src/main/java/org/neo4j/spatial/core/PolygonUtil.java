@@ -5,13 +5,16 @@ import org.neo4j.spatial.algo.AlgoUtil;
 import java.util.Arrays;
 
 public class PolygonUtil {
+    private PolygonUtil() {
+    }
+
     public static Point[] closeRing(Point... points) {
         if (points.length < 2) {
             throw new IllegalArgumentException("Cannot close ring of less than 2 points");
         }
         Point first = points[0];
         Point last = points[points.length - 1];
-        if (AlgoUtil.equal(first.getCoordinate(), last.getCoordinate())) {
+        if (AlgoUtil.isEqual(first.getCoordinate(), last.getCoordinate())) {
             return points;
         } else {
             Point[] closed = Arrays.copyOf(points, points.length + 1);
@@ -21,7 +24,6 @@ public class PolygonUtil {
     }
 
     public static Point[] openRing(Point[] points) {
-        Point[] copy = Arrays.copyOf(points, points.length - 1);
-        return copy;
+        return Arrays.copyOf(points, points.length - 1);
     }
 }

@@ -9,6 +9,9 @@ public class AreaCalculator {
     private static CartesianArea cartesian;
     private static WGS84Area wgs84;
 
+    private AreaCalculator() {
+    }
+
     private static Area getCartesian() {
         if (cartesian == null) {
             cartesian = new CartesianArea();
@@ -24,7 +27,7 @@ public class AreaCalculator {
     }
 
     public static Area getCalculator(Polygon polygon) {
-        if (polygon.getCRS() == CRS.Cartesian) {
+        if (polygon.getCRS() == CRS.CARTESIAN) {
             return getCartesian();
         } else {
             return getWGS84();
@@ -32,7 +35,7 @@ public class AreaCalculator {
     }
 
     public static Area getCalculator(CRS crs) {
-        if (crs == CRS.Cartesian) {
+        if (crs == CRS.CARTESIAN) {
             return getCartesian();
         } else {
             return getWGS84();

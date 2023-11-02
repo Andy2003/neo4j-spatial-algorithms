@@ -46,8 +46,7 @@ public class Neo4jSimpleGraphNodePolyline extends Neo4jSimpleGraphPolyline {
     @Override
     public Point getNextPoint() {
         super.traversing = true;
-        pointer = getNextNode(pointer);
-        Point point = extractPoint(pointer);
-        return point;
+        pointer = getNextNode();
+        return extractPoint(pointer);
     }
 }

@@ -2,15 +2,9 @@ package org.neo4j.spatial.algo.cartesian.intersect;
 
 import org.neo4j.spatial.algo.AlgoUtil;
 import org.neo4j.spatial.algo.Intersect;
-import org.neo4j.spatial.algo.LinearReference;
 import org.neo4j.spatial.core.*;
 
 public abstract class CartesianIntersect implements Intersect {
-    @Override
-    public abstract Point[] intersect(Polygon a, Polygon b);
-
-    @Override
-    public abstract boolean doesIntersect(Polygon a, Polygon b);
 
     @Override
     public Point intersect(LineSegment a, LineSegment b) {
@@ -39,7 +33,7 @@ public abstract class CartesianIntersect implements Intersect {
                         new double[]{b0.getCoordinate()[1], b1.getCoordinate()[1]
                         });
                 if (y != null) {
-                    return Point.point(CRS.Cartesian, a0.getCoordinate()[0], y);
+                    return Point.point(CRS.CARTESIAN, a0.getCoordinate()[0], y);
                 }
             }
             return null;
@@ -56,7 +50,7 @@ public abstract class CartesianIntersect implements Intersect {
         }
 
         //Two line segments with the same slope only distance if they have the same offset and overlap (in one point)
-        if (AlgoUtil.equal(l1.getA(), l2.getA())) {
+        if (AlgoUtil.isEqual(l1.getA(), l2.getA())) {
             if (l1.getB() != l2.getB()) {
                 return null;
             }
@@ -68,7 +62,7 @@ public abstract class CartesianIntersect implements Intersect {
                     new double[]{a0.getCoordinate()[1], a1.getCoordinate()[1]},
                     new double[]{b0.getCoordinate()[1], b1.getCoordinate()[1]});
 
-            return Point.point(CRS.Cartesian, x, y);
+            return Point.point(CRS.CARTESIAN, x, y);
         }
 
         double[] coordinates = new double[2];
@@ -85,7 +79,7 @@ public abstract class CartesianIntersect implements Intersect {
             }
         }
 
-        return Point.point(CRS.Cartesian, coordinates);
+        return Point.point(CRS.CARTESIAN, coordinates);
     }
 
     /**
@@ -115,7 +109,7 @@ public abstract class CartesianIntersect implements Intersect {
         }
 
 
-        return Point.point(CRS.Cartesian, x, y);
+        return Point.point(CRS.CARTESIAN, x, y);
     }
 
     /**
@@ -180,10 +174,6 @@ public abstract class CartesianIntersect implements Intersect {
             highest = inter[0];
         }
 
-        if (AlgoUtil.lessOrEqual(lowest, value) && AlgoUtil.lessOrEqual(value, highest)) {
-            return true;
-        }
-
-        return false;
+        return AlgoUtil.lessOrEqual(lowest, value) && AlgoUtil.lessOrEqual(value, highest);
     }
 }

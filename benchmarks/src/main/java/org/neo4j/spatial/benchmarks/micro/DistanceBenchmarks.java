@@ -1,7 +1,6 @@
 package org.neo4j.spatial.benchmarks.micro;
 
 import org.neo4j.spatial.algo.Distance;
-import org.neo4j.spatial.algo.DistanceCalculator;
 import org.neo4j.spatial.algo.cartesian.CartesianDistance;
 import org.neo4j.spatial.algo.wgs84.WGS84Distance;
 import org.neo4j.spatial.benchmarks.JfrProfiler;
@@ -40,7 +39,7 @@ public class DistanceBenchmarks {
     public void testCartesianDistance(Blackhole bh) {
         for (double x = -1000.0; x < 1000.0; x += 1.0) {
             for (double y = -1000.0; y < 1000.0; y += 1.0) {
-                bh.consume(cartesianCalculator.distance(Point.point(CRS.Cartesian, x, y), Point.point(CRS.Cartesian, -x, -y)));
+                bh.consume(cartesianCalculator.distance(Point.point(CRS.CARTESIAN, x, y), Point.point(CRS.CARTESIAN, -x, -y)));
             }
         }
     }

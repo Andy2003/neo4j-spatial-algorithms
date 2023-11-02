@@ -12,7 +12,7 @@ public class PolylineTest {
         double[][] coordinates = getPoints(n);
         Point[] points = new Point[n];
         for (int i = 0; i < n; i++) {
-            points[i] = Point.point(CRS.Cartesian, coordinates[i]);
+            points[i] = Point.point(CRS.CARTESIAN, coordinates[i]);
         }
 
         Polyline polyline = Polyline.polyline(points);
@@ -24,7 +24,7 @@ public class PolylineTest {
         }
         assertThat(polygonPoints.length, equalTo(n)); //n iterations
 
-        polyline.startTraversal(Point.point(CRS.Cartesian, 5, 0), Point.point(CRS.Cartesian, 5, 2));
+        polyline.startTraversal(Point.point(CRS.CARTESIAN, 5, 0), Point.point(CRS.CARTESIAN, 5, 2));
         idx = 0;
         while (!polyline.fullyTraversed()) {
             Point point = polyline.getNextPoint();
@@ -34,7 +34,7 @@ public class PolylineTest {
         assertThat(idx, equalTo(n)); //n iterations
 
 
-        polyline.startTraversal(Point.point(CRS.Cartesian, 0, 0), Point.point(CRS.Cartesian, 0, 2));
+        polyline.startTraversal(Point.point(CRS.CARTESIAN, 0, 0), Point.point(CRS.CARTESIAN, 0, 2));
         idx = n-1;
         while (!polyline.fullyTraversed()) {
             Point point = polyline.getNextPoint();
@@ -44,7 +44,7 @@ public class PolylineTest {
         assertThat(idx, equalTo(-1)); //n iterations
 
 
-        polyline.startTraversal(Point.point(CRS.Cartesian, 0, 8), Point.point(CRS.Cartesian, 5, 8));
+        polyline.startTraversal(Point.point(CRS.CARTESIAN, 0, 8), Point.point(CRS.CARTESIAN, 5, 8));
         idx = 5;
         while (!polyline.fullyTraversed()) {
             Point point = polyline.getNextPoint();

@@ -1,6 +1,5 @@
 package org.neo4j.spatial.benchmarks.macro;
 
-import org.neo4j.configuration.GraphDatabaseSettings;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -12,6 +11,7 @@ import org.neo4j.spatial.benchmarks.JfrProfiler;
 import org.neo4j.spatial.core.CRS;
 import org.neo4j.spatial.core.MultiPolygon;
 import org.neo4j.spatial.core.MultiPolyline;
+import org.neo4j.spatial.core.Polygon;
 import org.neo4j.spatial.neo4j.UserDefinedFunctions;
 import org.neo4j.test.TestDatabaseManagementServiceBuilder;
 import org.openjdk.jmh.annotations.*;
@@ -34,10 +34,10 @@ public class IntersectMacroBenchmarks {
     private Node polylineNode;
     private DatabaseManagementService databases;
     private GraphDatabaseService db;
-    private Intersect geographicNaiveCalculator = IntersectCalculator.getCalculator(CRS.WGS84, IntersectCalculator.AlgorithmVariant.Naive);
-    private Intersect geographicSweepCalculator = IntersectCalculator.getCalculator(CRS.WGS84, IntersectCalculator.AlgorithmVariant.MCSweepLine);
-    private Intersect cartesianNaiveCalculator = IntersectCalculator.getCalculator(CRS.Cartesian, IntersectCalculator.AlgorithmVariant.Naive);
-    private Intersect cartesianSweepCalculator = IntersectCalculator.getCalculator(CRS.Cartesian, IntersectCalculator.AlgorithmVariant.MCSweepLine);
+    private Intersect geographicNaiveCalculator = IntersectCalculator.getCalculator(CRS.WGS84, IntersectCalculator.AlgorithmVariant.NAIVE);
+    private Intersect geographicSweepCalculator = IntersectCalculator.getCalculator(CRS.WGS84, IntersectCalculator.AlgorithmVariant.MC_SWEEP_LINE);
+    private Intersect cartesianNaiveCalculator = IntersectCalculator.getCalculator(CRS.CARTESIAN, IntersectCalculator.AlgorithmVariant.NAIVE);
+    private Intersect cartesianSweepCalculator = IntersectCalculator.getCalculator(CRS.CARTESIAN, IntersectCalculator.AlgorithmVariant.MC_SWEEP_LINE);
 
 
     public static void main(String[] args) throws RunnerException {
@@ -67,13 +67,13 @@ public class IntersectMacroBenchmarks {
 
         try (Transaction tx = db.beginTx()) {
             for (int i = 0; i < ids.length; i++) {
-                nodes[i] = tx.findNode(label, "relation_osm_id", ids[i]);
+                nodes[i] = tx.findNode(label, Polygon.RELATION_OSM_ID, ids[i]);
 
                 if (nodes[i] == null) {
                     throw new IllegalStateException("OSMRelation not found for relation: " + ids[i]);
                 }
             }
-            polylineNode = tx.findNode(label, "relation_osm_id", polylineId);
+            polylineNode = tx.findNode(label, Polygon.RELATION_OSM_ID, polylineId);
 
             tx.commit();
         }

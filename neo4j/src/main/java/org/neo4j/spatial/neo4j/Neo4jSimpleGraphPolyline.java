@@ -1,5 +1,9 @@
 package org.neo4j.spatial.neo4j;
 
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Objects;
+
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
@@ -14,15 +18,13 @@ import org.neo4j.kernel.impl.traversal.MonoDirectionalTraversalDescription;
 import org.neo4j.spatial.algo.Distance;
 import org.neo4j.spatial.algo.DistanceCalculator;
 import org.neo4j.spatial.core.Point;
+import org.neo4j.spatial.core.Polygon;
 import org.neo4j.spatial.core.Polyline;
-
-import java.util.Arrays;
-import java.util.Iterator;
 
 import static java.lang.String.format;
 
 public abstract class Neo4jSimpleGraphPolyline implements Polyline {
-    private long osmRelationId;
+    private final long osmRelationId;
     private Iterator<Node> nodeIterator;
     boolean traversing;
     Node pointer;
@@ -30,7 +32,7 @@ public abstract class Neo4jSimpleGraphPolyline implements Polyline {
     Node main;
     Point startPoint;
 
-    public Neo4jSimpleGraphPolyline(Node main, long osmRelationId) {
+    protected Neo4jSimpleGraphPolyline(Node main, long osmRelationId) {
         this.osmRelationId = osmRelationId;
         this.traversing = false;
         this.pointer = null;
@@ -144,7 +146,7 @@ public abstract class Neo4jSimpleGraphPolyline implements Polyline {
 
     abstract Point extractPoint(Node node);
 
-    Node getNextNode(Node node) {
+    Node getNextNode() {
         if (this.nodeIterator == null) {
             throw new TraversalException("No traversal is currently ongoing");
         }
@@ -157,12 +159,12 @@ public abstract class Neo4jSimpleGraphPolyline implements Polyline {
     }
 
     private static class WayEvaluator implements Evaluator {
-        private long relationId;
-        private Relation relation;
-        private Direction direction;
+        private final long relationId;
+        private final Relation relation;
+        private final Direction direction;
         private boolean firstWay;
 
-        private long previousLocationNode = -1;
+        private String  previousLocationNode;
         private Direction lastNextDirection;
 
         public WayEvaluator(long relationId, Relation relation, Direction direction) {
@@ -176,12 +178,12 @@ public abstract class Neo4jSimpleGraphPolyline implements Polyline {
         public Evaluation evaluate(Path path) {
             Relationship rel = path.lastRelationship();
             Node endNode = path.endNode();
-            long locationNode = getLocationNode(endNode);
+            String  locationNode = getLocationNode(endNode);
 
-            if (path.length() == 1) {
-                if (!(rel.isType(this.relation) && validDirection(rel, endNode, this.direction))) {
-                    return Evaluation.EXCLUDE_AND_PRUNE;
-                }
+            if (path.length() == 1
+                    && !(rel.isType(this.relation) && validDirection(rel, endNode, this.direction)))
+            {
+                return Evaluation.EXCLUDE_AND_PRUNE;
             }
 
             if (rel == null) {
@@ -189,7 +191,7 @@ public abstract class Neo4jSimpleGraphPolyline implements Polyline {
                 return Evaluation.INCLUDE_AND_CONTINUE;
             }
 
-            if (locationNode == previousLocationNode) {
+            if (Objects.equals(locationNode, previousLocationNode)) {
                 if (rel.isType(Relation.NEXT_IN_POLYLINE)) {
                     if (!partOfPolyline(rel) || !validDirection(rel, endNode, this.direction)) {
                         return Evaluation.EXCLUDE_AND_PRUNE;
@@ -227,19 +229,14 @@ public abstract class Neo4jSimpleGraphPolyline implements Polyline {
             return Evaluation.EXCLUDE_AND_PRUNE;
         }
 
-        private long getLocationNode(Node node) {
-            return node.getSingleRelationship(Relation.NODE, Direction.OUTGOING).getEndNodeId();
+        private String getLocationNode(Node node) {
+            return node.getSingleRelationship(Relation.NODE, Direction.OUTGOING).getEndNode().getElementId();
         }
 
         private boolean validDirection(Relationship rel, Node endNode, Direction direction) {
-            if (direction != null) {
-                if (direction == Direction.OUTGOING && endNode.equals(rel.getStartNode())) {
-                    return false;
-                } else if (direction == Direction.INCOMING && endNode.equals(rel.getEndNode())) {
-                    return false;
-                }
-            }
-            return true;
+            return direction == null
+                    || !(direction == Direction.OUTGOING && endNode.equals(rel.getStartNode()))
+                    && !(direction == Direction.INCOMING && endNode.equals(rel.getEndNode()));
         }
 
         private boolean partOfPolyline(Relationship rel) {
@@ -247,10 +244,10 @@ public abstract class Neo4jSimpleGraphPolyline implements Polyline {
         }
 
         static boolean partOfPolyline(Relationship rel, long relationId) {
-            long[] ids = (long[]) rel.getProperty("relation_osm_ids");
+            long[] ids = (long[]) rel.getProperty(Polygon.RELATION_OSM_IDS);
 
-            for (int i = 0; i < ids.length; i++) {
-                if (ids[i] == relationId) {
+            for (long id : ids) {
+                if (id == relationId) {
                     return true;
                 }
             }
@@ -258,7 +255,7 @@ public abstract class Neo4jSimpleGraphPolyline implements Polyline {
         }
     }
 
-    private class TraversalException extends RuntimeException {
+    private static class TraversalException extends RuntimeException {
         public TraversalException(String message) {
         }
     }

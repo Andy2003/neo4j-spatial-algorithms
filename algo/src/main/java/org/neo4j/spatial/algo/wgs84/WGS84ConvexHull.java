@@ -8,14 +8,14 @@ import org.neo4j.spatial.core.Polygon;
 import org.neo4j.spatial.core.Vector;
 
 import java.net.CacheRequest;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class WGS84ConvexHull {
+
+    private WGS84ConvexHull() {
+    }
+
     /**
      * Computes the convex hull of a multipolygon using Graham's scan
      *
@@ -121,16 +121,16 @@ public class WGS84ConvexHull {
 
         } else {
 
-            Stack<Vector> stack = new Stack<>();
+            var stack = new LinkedList<Vector>();
 
             for (int i = 0; i < rotatedVectors.length + 1; i++) {
                 Vector v = rotatedVectors[(i + start) % rotatedVectors.length];
 
                 //Remove last point from the stack if it does not cross the edge (stack.size()-2), v)
-                while (stack.size() > 1 && WGSUtil.intersect(stack.get(stack.size() - 2), v, stack.peek(), WGSUtil.NORTH_POLE) == null) {
-                    stack.pop();
+                while (stack.size() > 1 && WGSUtil.intersect(stack.get(stack.size() - 2), v, stack.getLast(), WGSUtil.NORTH_POLE) == null) {
+                    stack.removeLast();
                 }
-                stack.push(v);
+                stack.addLast(v);
             }
 
             return Polygon.simple(stack.stream().map(v -> points[mappingToIndex.get(v)]).toArray(Point[]::new));
@@ -184,9 +184,8 @@ public class WGS84ConvexHull {
      * @return The pole represented as a n-vector. Returns null if not all the points reside on the same hemisphere
      */
     public static Vector getPoleOfHemisphere(Vector[] vectors) {
-        Stack<Vector> poles = new Stack<>();
+        var poles = new LinkedList<Vector>();
 
-        outer:
         for (int i = 0; i < vectors.length; i++) {
             for (int j = 0; j < vectors.length; j++) {
                 if (i == j) {
@@ -221,13 +220,13 @@ public class WGS84ConvexHull {
             }
         }
 
-        if (poles.empty()) {
+        if (poles.isEmpty()) {
             return null;
         }
 
-        Vector center = poles.pop();
-        while (!poles.empty()) {
-            center = center.add(poles.pop());
+        Vector center = poles.removeLast();
+        while (!poles.isEmpty()) {
+            center = center.add(poles.removeLast());
         }
 
         return center.normalize();

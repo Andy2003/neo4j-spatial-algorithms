@@ -10,6 +10,9 @@ public class Neo4jArrayToInMemoryConverter {
     private static final String POLYGON_PROPERTY = "polygon";
     private static final String POLYLINE_PROPERTY = "polyline";
 
+    private Neo4jArrayToInMemoryConverter() {
+    }
+
     public static Polygon.SimplePolygon convertToInMemoryPolygon(Node node) {
         org.neo4j.graphdb.spatial.Point[] neo4jPoints = (org.neo4j.graphdb.spatial.Point[]) node.getProperty(POLYGON_PROPERTY);
 

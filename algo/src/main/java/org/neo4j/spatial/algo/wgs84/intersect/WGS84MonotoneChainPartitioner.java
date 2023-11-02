@@ -1,17 +1,15 @@
 package org.neo4j.spatial.algo.wgs84.intersect;
 
-import org.neo4j.spatial.core.CRS;
-import org.neo4j.spatial.core.LineSegment;
-import org.neo4j.spatial.core.MonotoneChain;
-import org.neo4j.spatial.core.Point;
-import org.neo4j.spatial.core.Polygon;
-import org.neo4j.spatial.core.Polyline;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.neo4j.spatial.core.LineSegment;
+import org.neo4j.spatial.core.MonotoneChain;
+import org.neo4j.spatial.core.Polygon;
+import org.neo4j.spatial.core.Polyline;
+
 public class WGS84MonotoneChainPartitioner {
-    private List<LineSegment> verticals;
+    private final List<LineSegment> verticals;
 
     public WGS84MonotoneChainPartitioner() {
         verticals = new ArrayList<>();
@@ -20,7 +18,7 @@ public class WGS84MonotoneChainPartitioner {
     /**
      * Partition the polygon in x-monotone chains.
      *
-     * @param polygon
+     * @param polygon The polygon to partition
      * @return List of x-monotone chains which together create the input polygon
      */
     public List<MonotoneChain> partition(Polygon.SimplePolygon polygon) {
@@ -47,7 +45,7 @@ public class WGS84MonotoneChainPartitioner {
                 }
 
                 lastIncreasing = currentIncreasing;
-            } else if (lastIncreasing == 0.0 ||currentIncreasing == lastIncreasing) {
+            } else if (lastIncreasing == 0.0 || currentIncreasing == lastIncreasing) {
                 chain.add(lineSegments[i]);
                 lastIncreasing = currentIncreasing;
             } else {
@@ -62,31 +60,33 @@ public class WGS84MonotoneChainPartitioner {
         int lastIndex = lineSegments.length - 1;
         double firstIncreasing = getXDirection(lineSegments[0]);
         double currentIncreasing = getXDirection(lineSegments[lastIndex]);
-        if (currentIncreasing == 0.0 || lastIncreasing == 0.0) {
-            //Skip
-        } else if (currentIncreasing == lastIncreasing) {
-            chain.add(lineSegments[lastIndex]);
+        if (currentIncreasing != 0.0 && lastIncreasing != 0.0) {
+            if (currentIncreasing == lastIncreasing) {
+                chain.add(lineSegments[lastIndex]);
 
-            if (currentIncreasing == firstIncreasing) {
-                chain.add(result.get(0));
-                result.remove(0);
-                result.add(chain);
+                if (currentIncreasing == firstIncreasing) {
+                    chain.add(result.get(0));
+                    result.remove(0);
+                    result.add(chain);
+                } else {
+                    result.add(chain);
+                }
             } else {
                 result.add(chain);
-            }
-        } else {
-            result.add(chain);
-            chain = new MonotoneChain();
-            chain.add(lineSegments[lastIndex]);
+                chain = new MonotoneChain();
+                chain.add(lineSegments[lastIndex]);
 
-            if (currentIncreasing == firstIncreasing) {
-                chain.add(result.get(0));
-                result.remove(0);
-                result.add(chain);
-            } else {
-                result.add(chain);
+                if (currentIncreasing == firstIncreasing) {
+                    chain.add(result.get(0));
+                    result.remove(0);
+                    result.add(chain);
+                } else {
+                    result.add(chain);
+                }
             }
         }
+        //Skip
+
 
         for (MonotoneChain monotoneChain : result) {
             monotoneChain.initialize();
@@ -98,7 +98,7 @@ public class WGS84MonotoneChainPartitioner {
     /**
      * Partition the polyline in x-monotone chains.
      *
-     * @param polyline
+     * @param polyline The polyline to partition
      * @return List of x-monotone chains which together create the input polyline
      */
     public List<MonotoneChain> partition(Polyline polyline) {
@@ -121,7 +121,7 @@ public class WGS84MonotoneChainPartitioner {
                 result.add(chain);
                 chain = new MonotoneChain();
                 lastIncreasing = currentIncreasing;
-            } else if (lastIncreasing == 0.0 ||currentIncreasing == lastIncreasing) {
+            } else if (lastIncreasing == 0.0 || currentIncreasing == lastIncreasing) {
                 chain.add(lineSegments[i]);
             } else {
                 result.add(chain);
@@ -142,7 +142,8 @@ public class WGS84MonotoneChainPartitioner {
 
     public static double getXDirection(LineSegment lineSegment) {
         double dx = LineSegment.dX(lineSegment);
-        return dx == 0 ? 0.0 : dx > 0 ? 1.0 : -1.0;
+        if (dx == 0) return 0.0;
+        return dx > 0 ? 1.0 : -1.0;
     }
 
     public List<LineSegment> getVerticals() {

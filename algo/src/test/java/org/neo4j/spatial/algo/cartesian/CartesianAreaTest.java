@@ -13,10 +13,10 @@ public class CartesianAreaTest {
     @Test
     public void area() {
         Polygon.SimplePolygon simple = Polygon.simple(
-                Point.point(CRS.Cartesian, -10, -10),
-                Point.point(CRS.Cartesian, 10, -10),
-                Point.point(CRS.Cartesian, 10, 10),
-                Point.point(CRS.Cartesian, -10, 10)
+                Point.point(CRS.CARTESIAN, -10, -10),
+                Point.point(CRS.CARTESIAN, 10, -10),
+                Point.point(CRS.CARTESIAN, 10, 10),
+                Point.point(CRS.CARTESIAN, -10, 10)
         );
 
         double actual = new CartesianArea().area(simple);
@@ -24,9 +24,9 @@ public class CartesianAreaTest {
         assertThat(actual, equalTo(expected));
 
         simple = Polygon.simple(
-                Point.point(CRS.Cartesian, -10, -10),
-                Point.point(CRS.Cartesian, 10, 10),
-                Point.point(CRS.Cartesian, -10, 10)
+                Point.point(CRS.CARTESIAN, -10, -10),
+                Point.point(CRS.CARTESIAN, 10, 10),
+                Point.point(CRS.CARTESIAN, -10, 10)
         );
 
         actual = new CartesianArea().area(simple);

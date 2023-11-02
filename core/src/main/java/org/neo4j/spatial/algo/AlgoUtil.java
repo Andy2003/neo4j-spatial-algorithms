@@ -5,6 +5,9 @@ import org.neo4j.spatial.core.Point;
 public class AlgoUtil {
     public static final double EPSILON = 0.000000003;
 
+    private AlgoUtil() {
+    }
+
     /**
      * Computes the direction of the of the a-b-c turn by computing the z-component of ab x ac
      *
@@ -33,7 +36,8 @@ public class AlgoUtil {
      */
     public static int ccw(double[] a, double[] b, double[] c) {
         double z = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
-        return z == 0 ? 0 : (z < 0 ? -1 : 1);
+        if (z == 0) return 0;
+        return z < 0 ? -1 : 1;
     }
 
     public static double dotProduct(double[] a, double[] b) {
@@ -48,11 +52,11 @@ public class AlgoUtil {
         return sum;
     }
 
-    public static boolean equal(double a, double b) {
+    public static boolean isEqual(double a, double b) {
         return Math.abs(a-b) < EPSILON;
     }
 
-    public static boolean equal(double a, double b, double epsilon) {
+    public static boolean isEqual(double a, double b, double epsilon) {
         return Math.abs(a-b) < epsilon;
     }
 
@@ -60,8 +64,8 @@ public class AlgoUtil {
         return a-b <= EPSILON;
     }
 
-    public static boolean equal(double[] a, double[] b) {
-        return equal(a[0], b[0]) && equal(a[1], b[1]);
+    public static boolean isEqual(double[] a, double[] b) {
+        return isEqual(a[0], b[0]) && isEqual(a[1], b[1]);
     }
 
     public static double[] rotate(double[] c, double angle) {

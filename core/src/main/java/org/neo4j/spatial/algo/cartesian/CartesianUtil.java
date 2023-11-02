@@ -3,6 +3,10 @@ package org.neo4j.spatial.algo.cartesian;
 import static java.lang.String.format;
 
 public class CartesianUtil {
+
+    private CartesianUtil() {
+    }
+
     public static double distance(double[] c1, double[] c2) {
         if (c1.length != c2.length) {
             throw new IllegalArgumentException(format("Cannot calculate distance between points of different dimension: %d != %d", c1.length, c2.length));

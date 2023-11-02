@@ -9,6 +9,9 @@ public class LinearReferenceCalculator {
     private static CartesianLinearReference cartesian;
     private static WGS84LinearReference wgs84;
 
+    private LinearReferenceCalculator() {
+    }
+
     private static LinearReference getCartesian() {
         if (cartesian == null) {
             cartesian = new CartesianLinearReference();
@@ -24,7 +27,7 @@ public class LinearReferenceCalculator {
     }
 
     public static LinearReference getCalculator(CRS crs) {
-        if (crs == CRS.Cartesian) {
+        if (crs == CRS.CARTESIAN) {
             return getCartesian();
         } else {
             return getWGS84();
@@ -32,7 +35,7 @@ public class LinearReferenceCalculator {
     }
 
     public static LinearReference getCalculator(Polygon.SimplePolygon polygon) {
-        if (polygon.getCRS() == CRS.Cartesian) {
+        if (polygon.getCRS() == CRS.CARTESIAN) {
             return getCartesian();
         } else {
             return getWGS84();

@@ -17,44 +17,44 @@ public class CartesianDistanceTest {
     public void shouldNotWorkWithInvalidPoints() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Cannot calculate distance between points of different dimension: 3 != 2");
-        Point point = Point.point(CRS.Cartesian, 1, 2, 3);
-        Distance calculator = DistanceCalculator.getCalculator(CRS.Cartesian);
-        calculator.distance(point, Point.point(CRS.Cartesian, 3, 4));
+        Point point = Point.point(CRS.CARTESIAN, 1, 2, 3);
+        Distance calculator = DistanceCalculator.getCalculator(CRS.CARTESIAN);
+        calculator.distance(point, Point.point(CRS.CARTESIAN, 3, 4));
     }
 
     @Test
     public void shouldWorkWithValid2DPoints() {
-        Distance calculator = DistanceCalculator.getCalculator(CRS.Cartesian);
-        assertThat(calculator.distance(Point.point(CRS.Cartesian, 0, 0), Point.point(CRS.Cartesian, 0, 0)), equalTo(0.0));
-        assertThat(calculator.distance(Point.point(CRS.Cartesian, 0, 0), Point.point(CRS.Cartesian, 1, 0)), equalTo(1.0));
-        assertThat(calculator.distance(Point.point(CRS.Cartesian, 0, 0), Point.point(CRS.Cartesian, 0, 1)), equalTo(1.0));
-        assertThat(calculator.distance(Point.point(CRS.Cartesian, 1, 0), Point.point(CRS.Cartesian, 0, 0)), equalTo(1.0));
-        assertThat(calculator.distance(Point.point(CRS.Cartesian, 0, 1), Point.point(CRS.Cartesian, 0, 0)), equalTo(1.0));
-        assertThat(calculator.distance(Point.point(CRS.Cartesian, 0, 0), Point.point(CRS.Cartesian, 1, 1)), closeTo(1.414, 0.001));
-        assertThat(calculator.distance(Point.point(CRS.Cartesian, -1, -1), Point.point(CRS.Cartesian, 1, 1)), closeTo(2.828, 0.001));
+        Distance calculator = DistanceCalculator.getCalculator(CRS.CARTESIAN);
+        assertThat(calculator.distance(Point.point(CRS.CARTESIAN, 0, 0), Point.point(CRS.CARTESIAN, 0, 0)), equalTo(0.0));
+        assertThat(calculator.distance(Point.point(CRS.CARTESIAN, 0, 0), Point.point(CRS.CARTESIAN, 1, 0)), equalTo(1.0));
+        assertThat(calculator.distance(Point.point(CRS.CARTESIAN, 0, 0), Point.point(CRS.CARTESIAN, 0, 1)), equalTo(1.0));
+        assertThat(calculator.distance(Point.point(CRS.CARTESIAN, 1, 0), Point.point(CRS.CARTESIAN, 0, 0)), equalTo(1.0));
+        assertThat(calculator.distance(Point.point(CRS.CARTESIAN, 0, 1), Point.point(CRS.CARTESIAN, 0, 0)), equalTo(1.0));
+        assertThat(calculator.distance(Point.point(CRS.CARTESIAN, 0, 0), Point.point(CRS.CARTESIAN, 1, 1)), closeTo(1.414, 0.001));
+        assertThat(calculator.distance(Point.point(CRS.CARTESIAN, -1, -1), Point.point(CRS.CARTESIAN, 1, 1)), closeTo(2.828, 0.001));
     }
 
     @Test
     public void shouldWorkWithLineSegmentAndPoint() {
-        LineSegment a = LineSegment.lineSegment(Point.point(CRS.Cartesian, 0, 0), Point.point(CRS.Cartesian, 10, 10));
-        Distance calculator = DistanceCalculator.getCalculator(CRS.Cartesian);
-        assertThat(calculator.distance(a, Point.point(CRS.Cartesian, 0, -5)), equalTo(5.0));
-        assertThat(calculator.distance(a, Point.point(CRS.Cartesian, 10, 20)), equalTo(10.0));
-        assertThat(calculator.distance(a, Point.point(CRS.Cartesian, 5, 5)), equalTo(0.0));
-        assertThat(calculator.distance(a, Point.point(CRS.Cartesian, 10, 0)), closeTo(7.07106781186547, 0.0001));
+        LineSegment a = LineSegment.lineSegment(Point.point(CRS.CARTESIAN, 0, 0), Point.point(CRS.CARTESIAN, 10, 10));
+        Distance calculator = DistanceCalculator.getCalculator(CRS.CARTESIAN);
+        assertThat(calculator.distance(a, Point.point(CRS.CARTESIAN, 0, -5)), equalTo(5.0));
+        assertThat(calculator.distance(a, Point.point(CRS.CARTESIAN, 10, 20)), equalTo(10.0));
+        assertThat(calculator.distance(a, Point.point(CRS.CARTESIAN, 5, 5)), equalTo(0.0));
+        assertThat(calculator.distance(a, Point.point(CRS.CARTESIAN, 10, 0)), closeTo(7.07106781186547, 0.0001));
     }
 
     @Test
     public void shouldWorkWithTwoLineSegments() {
-        LineSegment a = LineSegment.lineSegment(Point.point(CRS.Cartesian, 0, 0), Point.point(CRS.Cartesian, 10, 10));
+        LineSegment a = LineSegment.lineSegment(Point.point(CRS.CARTESIAN, 0, 0), Point.point(CRS.CARTESIAN, 10, 10));
 
         Point[][] lineSegments = new Point[][]{
-                {Point.point(CRS.Cartesian, 0, 10), Point.point(CRS.Cartesian, 10, 0)},
-                {Point.point(CRS.Cartesian, -10, 0), Point.point(CRS.Cartesian, 10, 20)},
-                {Point.point(CRS.Cartesian, 20, 0), Point.point(CRS.Cartesian, 20, 20)}
+                {Point.point(CRS.CARTESIAN, 0, 10), Point.point(CRS.CARTESIAN, 10, 0)},
+                {Point.point(CRS.CARTESIAN, -10, 0), Point.point(CRS.CARTESIAN, 10, 20)},
+                {Point.point(CRS.CARTESIAN, 20, 0), Point.point(CRS.CARTESIAN, 20, 20)}
         };
 
-        Distance calculator = DistanceCalculator.getCalculator(CRS.Cartesian);
+        Distance calculator = DistanceCalculator.getCalculator(CRS.CARTESIAN);
 
         double[] expected = new double[]{
                 0,
@@ -71,19 +71,19 @@ public class CartesianDistanceTest {
     @Test
     public void shouldWorkWithSimplePolygonAndPoint() {
         Polygon.SimplePolygon a = Polygon.simple(
-                Point.point(CRS.Cartesian, -10,-10),
-                Point.point(CRS.Cartesian, 10,-10),
-                Point.point(CRS.Cartesian, 1, 0),
-                Point.point(CRS.Cartesian, 10,10),
-                Point.point(CRS.Cartesian, 0,20),
-                Point.point(CRS.Cartesian, -10,10),
-                Point.point(CRS.Cartesian, -1, 0)
+                Point.point(CRS.CARTESIAN, -10,-10),
+                Point.point(CRS.CARTESIAN, 10,-10),
+                Point.point(CRS.CARTESIAN, 1, 0),
+                Point.point(CRS.CARTESIAN, 10,10),
+                Point.point(CRS.CARTESIAN, 0,20),
+                Point.point(CRS.CARTESIAN, -10,10),
+                Point.point(CRS.CARTESIAN, -1, 0)
         );
 
-        Distance calculator = DistanceCalculator.getCalculator(CRS.Cartesian);
+        Distance calculator = DistanceCalculator.getCalculator(CRS.CARTESIAN);
 
-        assertThat(calculator.distance(a, Point.point(CRS.Cartesian, -20, -10)), equalTo(10.0));
-        assertThat(calculator.distance(a, Point.point(CRS.Cartesian, -0, -9)), equalTo(0.0));
+        assertThat(calculator.distance(a, Point.point(CRS.CARTESIAN, -20, -10)), equalTo(10.0));
+        assertThat(calculator.distance(a, Point.point(CRS.CARTESIAN, -0, -9)), equalTo(0.0));
     }
 
     @Test
@@ -91,30 +91,30 @@ public class CartesianDistanceTest {
         MultiPolygon a = new MultiPolygon();
         Point[][] polygonsA = new Point[][]{
                 {
-                        Point.point(CRS.Cartesian, -10, -10),
-                        Point.point(CRS.Cartesian, 10, -10),
-                        Point.point(CRS.Cartesian, 10, 10),
-                        Point.point(CRS.Cartesian, -10, 10),
-                        Point.point(CRS.Cartesian, -10, -10)
+                        Point.point(CRS.CARTESIAN, -10, -10),
+                        Point.point(CRS.CARTESIAN, 10, -10),
+                        Point.point(CRS.CARTESIAN, 10, 10),
+                        Point.point(CRS.CARTESIAN, -10, 10),
+                        Point.point(CRS.CARTESIAN, -10, -10)
                 },
                 {
-                        Point.point(CRS.Cartesian, -9, -9),
-                        Point.point(CRS.Cartesian, 9, -9),
-                        Point.point(CRS.Cartesian, 9, 9),
-                        Point.point(CRS.Cartesian, -9, 9),
-                        Point.point(CRS.Cartesian, -9, -9)
+                        Point.point(CRS.CARTESIAN, -9, -9),
+                        Point.point(CRS.CARTESIAN, 9, -9),
+                        Point.point(CRS.CARTESIAN, 9, 9),
+                        Point.point(CRS.CARTESIAN, -9, 9),
+                        Point.point(CRS.CARTESIAN, -9, -9)
                 },
                 {
-                        Point.point(CRS.Cartesian, -8, -8),
-                        Point.point(CRS.Cartesian, 8, -8),
-                        Point.point(CRS.Cartesian, 8, 8),
-                        Point.point(CRS.Cartesian, -8, 8)
+                        Point.point(CRS.CARTESIAN, -8, -8),
+                        Point.point(CRS.CARTESIAN, 8, -8),
+                        Point.point(CRS.CARTESIAN, 8, 8),
+                        Point.point(CRS.CARTESIAN, -8, 8)
                 },
                 {
-                        Point.point(CRS.Cartesian, -7, -7),
-                        Point.point(CRS.Cartesian, 7, -7),
-                        Point.point(CRS.Cartesian, 7, 7),
-                        Point.point(CRS.Cartesian, -7, 7)
+                        Point.point(CRS.CARTESIAN, -7, -7),
+                        Point.point(CRS.CARTESIAN, 7, -7),
+                        Point.point(CRS.CARTESIAN, 7, 7),
+                        Point.point(CRS.CARTESIAN, -7, 7)
                 }
         };
 
@@ -122,11 +122,11 @@ public class CartesianDistanceTest {
             a.insertPolygon(Polygon.simple(points));
         }
 
-        Distance calculator = DistanceCalculator.getCalculator(CRS.Cartesian);
+        Distance calculator = DistanceCalculator.getCalculator(CRS.CARTESIAN);
 
-        assertThat(calculator.distance(a, Point.point(CRS.Cartesian, 0, 0)), equalTo(7.0));
-        assertThat(calculator.distance(a, Point.point(CRS.Cartesian, 7.5, 0)), equalTo(0.0));
-        assertThat(calculator.distance(a, Point.point(CRS.Cartesian, 8, 0)), equalTo(0.0));
-        assertThat(calculator.distance(a, Point.point(CRS.Cartesian, 8.5, 0)), equalTo(0.5));
+        assertThat(calculator.distance(a, Point.point(CRS.CARTESIAN, 0, 0)), equalTo(7.0));
+        assertThat(calculator.distance(a, Point.point(CRS.CARTESIAN, 7.5, 0)), equalTo(0.0));
+        assertThat(calculator.distance(a, Point.point(CRS.CARTESIAN, 8, 0)), equalTo(0.0));
+        assertThat(calculator.distance(a, Point.point(CRS.CARTESIAN, 8.5, 0)), equalTo(0.5));
     }
 }

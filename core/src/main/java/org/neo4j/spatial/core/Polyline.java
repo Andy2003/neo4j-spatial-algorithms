@@ -157,7 +157,7 @@ public interface Polyline extends HasCRS {
         }
 
         private double distance(Point start, Point point) {
-            if (start.getCRS() == CRS.Cartesian) {
+            if (start.getCRS() == CRS.CARTESIAN) {
                 return CartesianUtil.distance(start.getCoordinate(), point.getCoordinate());
             } else {
                 Vector u = new Vector(start);
@@ -186,7 +186,7 @@ public interface Polyline extends HasCRS {
 
         @Override
         public boolean equals(Object other) {
-            return other instanceof Polyline && this.equals((Polyline) other);
+            return other instanceof Polyline polyline && this.equals(polyline);
         }
 
         public boolean equals(Polyline other) {

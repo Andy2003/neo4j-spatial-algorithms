@@ -5,12 +5,16 @@ import org.neo4j.graphdb.spatial.Point;
 import org.neo4j.internal.helpers.collection.Pair;
 import org.neo4j.spatial.algo.AlgoUtil;
 import org.neo4j.spatial.algo.wgs84.WGSUtil;
+import org.neo4j.spatial.core.Polygon;
 import org.neo4j.spatial.core.Vector;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class OSMTraverser {
+
+    private OSMTraverser() {
+    }
+
     /**
      * Traverse the OpenStreetMap graph looking for geometries in the form of a list of polygons and a list of polylines.
      *
@@ -20,7 +24,7 @@ public class OSMTraverser {
      */
     public static Pair<List<List<Node>>, List<List<Node>>> traverseOSMGraph(Transaction tx, Node main, double proximityThreshold) {
         List<List<Node>> wayNodes = collectWays(tx, main);
-        List<EnrichedWay> candidates = wayNodes.stream().map(EnrichedWay::new).collect(Collectors.toList());
+        List<EnrichedWay> candidates = wayNodes.stream().map(EnrichedWay::new).toList();
         int totalNodeCount = candidates.stream().mapToInt(EnrichedWay::size).sum();
         System.out.println("Found " + candidates.size() + " polygon/polyline candidates comprising " + totalNodeCount + " nodes from " + wayNodes.size() + " ways within " + main);
 
@@ -30,7 +34,7 @@ public class OSMTraverser {
         List<EnrichedWay> polylines = new ArrayList<>(enrichedWays.other());
         debugPolygonPolylines(totalNodeCount, polygons, polylines);
 
-        if (enrichedWays.other().size() > 0) {
+        if (!enrichedWays.other().isEmpty()) {
             System.out.println("Attempting proximity connections to covert some of " + polylines.size() + " polylines into polygons");
             enrichedWays = connectWaysByProximity(polylines, proximityThreshold);
 
@@ -39,8 +43,8 @@ public class OSMTraverser {
             debugPolygonPolylines(totalNodeCount, polygons, polylines);
         }
 
-        List<List<Node>> polygonNodes = polygons.stream().map(p -> p.wayNodes).collect(Collectors.toList());
-        List<List<Node>> polylineNodes = polylines.stream().map(p -> p.wayNodes).collect(Collectors.toList());
+        List<List<Node>> polygonNodes = polygons.stream().map(p -> p.wayNodes).toList();
+        List<List<Node>> polylineNodes = polylines.stream().map(p -> p.wayNodes).toList();
 
         return Pair.of(polygonNodes, polylineNodes);
     }
@@ -49,11 +53,11 @@ public class OSMTraverser {
         int polygonNodeCount = polygons.stream().mapToInt(EnrichedWay::size).sum();
         int polylineNodeCount = polylines.stream().mapToInt(EnrichedWay::size).sum();
         System.out.println("We have " + polygons.size() + " polygons (" + polygonNodeCount + "/" + totalNodeCount + " nodes, " + (100 * polygonNodeCount / totalNodeCount) + "%)");
-        for (Pair<EnrichedWay, Integer> top : polygons.stream().map(w -> Pair.of(w, w.size())).sorted((a, b) -> b.other() - a.other()).limit(10).collect(Collectors.toList())) {
+        for (Pair<EnrichedWay, Integer> top : polygons.stream().map(w -> Pair.of(w, w.size())).sorted((a, b) -> b.other() - a.other()).limit(10).toList()) {
             System.out.println("\t" + top.other() + "\t" + top.first());
         }
         System.out.println("We have " + polylines.size() + " polylines (" + polylineNodeCount + "/" + totalNodeCount + " nodes, " + (100 * polylineNodeCount / totalNodeCount) + "%)");
-        for (Pair<EnrichedWay, Integer> top : polylines.stream().map(w -> Pair.of(w, w.size())).sorted((a, b) -> b.other() - a.other()).limit(10).collect(Collectors.toList())) {
+        for (Pair<EnrichedWay, Integer> top : polylines.stream().map(w -> Pair.of(w, w.size())).sorted((a, b) -> b.other() - a.other()).limit(10).toList()) {
             System.out.println("\t" + top.other() + "\t" + top.first());
         }
     }
@@ -68,7 +72,7 @@ public class OSMTraverser {
     private static List<List<Node>> collectWays(Transaction tx, Node main) {
         List<List<Node>> wayNodes = new ArrayList<>();
         String findWayNodes;
-        if (main.hasProperty("relation_osm_id")) {
+        if (main.hasProperty(Polygon.RELATION_OSM_ID)) {
             findWayNodes = "MATCH (r:OSMRelation)-[:MEMBER*]->(w:OSMWay)-[:FIRST_NODE]->(f:OSMWayNode), " +
                     "(f)-[:NEXT*0..]->(wn:OSMWayNode) WHERE elementId(r) = $main " +
                     "RETURN f, collect(wn) AS nodes";
@@ -83,7 +87,7 @@ public class OSMTraverser {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("main", main.getElementId());
         Result result = tx.execute(findWayNodes, parameters);
-        while(result.hasNext()) {
+        while (result.hasNext()) {
             Map<String, Object> next = result.next();
             List<Node> nextWay = (List<Node>) next.get("nodes");
             wayNodes.add(nextWay);
@@ -140,7 +144,7 @@ public class OSMTraverser {
 
         polylines.add(candidates.remove(0));
 
-        while (candidates.size() > 0) {
+        while (!candidates.isEmpty()) {
             EnrichedWay wayToAdd = candidates.remove(0);
 
             double minDistance = Double.MAX_VALUE;
@@ -200,7 +204,7 @@ public class OSMTraverser {
             FF, FL, LF, LL
         }
 
-        EnrichedWay (List<Node> wayNodes) {
+        EnrichedWay(List<Node> wayNodes) {
             this.wayNodes = wayNodes;
             this.first = getOSMNode(wayNodes.get(0));
             this.last = getOSMNode(wayNodes.get(wayNodes.size() - 1));
@@ -264,7 +268,7 @@ public class OSMTraverser {
             options.add(Pair.of(distance(tl, of), JoinDirection.LF));
             options.add(Pair.of(distance(tl, ol), JoinDirection.LL));
 
-            return options.stream().min(Comparator.comparingDouble(Pair::first)).get();
+            return options.stream().min(Comparator.comparingDouble(Pair::first)).orElseThrow();
         }
 
         private double distance(double[] a, double[] b) {

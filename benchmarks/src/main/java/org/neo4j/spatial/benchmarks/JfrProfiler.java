@@ -1,13 +1,5 @@
 package org.neo4j.spatial.benchmarks;
 
-import org.openjdk.jmh.infra.BenchmarkParams;
-import org.openjdk.jmh.infra.IterationParams;
-import org.openjdk.jmh.profile.ExternalProfiler;
-import org.openjdk.jmh.profile.InternalProfiler;
-import org.openjdk.jmh.results.BenchmarkResult;
-import org.openjdk.jmh.results.IterationResult;
-import org.openjdk.jmh.results.Result;
-
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
@@ -16,13 +8,20 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+
+import org.openjdk.jmh.infra.BenchmarkParams;
+import org.openjdk.jmh.infra.IterationParams;
+import org.openjdk.jmh.profile.ExternalProfiler;
+import org.openjdk.jmh.profile.InternalProfiler;
+import org.openjdk.jmh.results.BenchmarkResult;
+import org.openjdk.jmh.results.IterationResult;
+import org.openjdk.jmh.results.Result;
 
 import static java.lang.String.format;
 
 public class JfrProfiler implements InternalProfiler, ExternalProfiler {
 
-    private boolean DUMP_ON_EXIT = true;
+    private static final boolean DUMP_ON_EXIT = true;
 
     static long getPid() {
         final String DELIM = "@";
@@ -35,7 +34,7 @@ public class JfrProfiler implements InternalProfiler, ExternalProfiler {
             if (idx != -1) {
                 String str = name.substring(0, name.indexOf(DELIM));
                 try {
-                    return Long.valueOf(str);
+                    return Long.parseLong(str);
                 } catch (NumberFormatException nfe) {
                     throw new IllegalStateException("Process PID is not a number: " + str);
                 }
@@ -51,23 +50,22 @@ public class JfrProfiler implements InternalProfiler, ExternalProfiler {
 
     @Override
     public Collection<String> addJVMOptions(BenchmarkParams params) {
-        List<String> args = Arrays.asList(
+        return Arrays.asList(
                 "-XX:+UnlockCommercialFeatures",
                 "-XX:+UnlockDiagnosticVMOptions",
                 "-XX:+FlightRecorder",
                 "-XX:+DebugNonSafepoints",
                 "-XX:+PreserveFramePointer",
                 "-XX:FlightRecorderOptions=stackdepth=256");
-        return args;
     }
 
     @Override
     public void beforeTrial(BenchmarkParams benchmarkParams) {
-
+        // nothing to do
     }
 
     @Override
-    public Collection<? extends Result> afterTrial(BenchmarkResult br, long pid, File stdOut, File stdErr) {
+    public Collection<? extends Result<?>> afterTrial(BenchmarkResult br, long pid, File stdOut, File stdErr) {
         return Collections.emptyList();
     }
 
@@ -87,7 +85,7 @@ public class JfrProfiler implements InternalProfiler, ExternalProfiler {
     }
 
     @Override
-    public Collection<? extends Result> afterIteration(BenchmarkParams benchmarkParams, IterationParams iterationParams, IterationResult result) {
+    public Collection<? extends Result<?>> afterIteration(BenchmarkParams benchmarkParams, IterationParams iterationParams, IterationResult result) {
         stopJfr(benchmarkParams.getBenchmark());
         return Collections.emptyList();
     }
@@ -131,7 +129,6 @@ public class JfrProfiler implements InternalProfiler, ExternalProfiler {
                                 "See: " + jfrLog.toAbsolutePath());
             }
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException("Error trying to start JFR profiler", e);
         }
     }
@@ -152,7 +149,7 @@ public class JfrProfiler implements InternalProfiler, ExternalProfiler {
                     Long.toString(getPid()),
                     "JFR.dump",
                     format("name=%s", name),
-                    format("filename='%s'", jfrProfilerOutput.toAbsolutePath())};
+                    format("filename='%s'", jfrProfilerOutput.toAbsolutePath()) };
 
             Process dumpJfr = new ProcessBuilder(dumpJfrCommand)
                     .redirectOutput(jfrLog.toFile())
@@ -179,7 +176,7 @@ public class JfrProfiler implements InternalProfiler, ExternalProfiler {
                     "jcmd",
                     Long.toString(getPid()),
                     "JFR.stop",
-                    format("name=%s", name)};
+                    format("name=%s", name) };
 
             Process stopJfr = new ProcessBuilder(stopJfrCommand)
                     .redirectOutput(jfrLog.toFile())

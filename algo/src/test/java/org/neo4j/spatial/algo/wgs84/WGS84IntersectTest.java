@@ -21,7 +21,7 @@ public class WGS84IntersectTest {
 
     @Parameterized.Parameters
     public static Collection data() {
-        IntersectCalculator.AlgorithmVariant[] variants = new IntersectCalculator.AlgorithmVariant[]{IntersectCalculator.AlgorithmVariant.Naive, IntersectCalculator.AlgorithmVariant.MCSweepLine};
+        IntersectCalculator.AlgorithmVariant[] variants = new IntersectCalculator.AlgorithmVariant[]{IntersectCalculator.AlgorithmVariant.NAIVE, IntersectCalculator.AlgorithmVariant.MC_SWEEP_LINE };
         return Arrays.asList(variants);
     }
 
@@ -88,7 +88,7 @@ public class WGS84IntersectTest {
                 Point.point(CRS.WGS84, -40, 3));
 
         Point[] actual = calculator.intersect(a, b);
-        Point[] expected = new Point[]{Point.point(CRS.Cartesian, -40, 0), Point.point(CRS.Cartesian, -40, 1.0313299764)};
+        Point[] expected = new Point[]{Point.point(CRS.CARTESIAN, -40, 0), Point.point(CRS.CARTESIAN, -40, 1.0313299764)};
         matchPoints(actual, expected);
     }
 
@@ -432,8 +432,8 @@ public class WGS84IntersectTest {
         for (int i = 0; i < expected.length; i++) {
             boolean flag = false;
             for (int j = 0; j < actual.length; j++) {
-                if (AlgoUtil.equal(actual[j].getCoordinate()[0], expected[i].getCoordinate()[0]) &&
-                        AlgoUtil.equal(actual[j].getCoordinate()[1], expected[i].getCoordinate()[1])) {
+                if (AlgoUtil.isEqual(actual[j].getCoordinate()[0], expected[i].getCoordinate()[0]) &&
+                        AlgoUtil.isEqual(actual[j].getCoordinate()[1], expected[i].getCoordinate()[1])) {
                     flag = true;
                     break;
                 }

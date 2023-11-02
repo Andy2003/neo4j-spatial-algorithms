@@ -1,18 +1,15 @@
 package org.neo4j.spatial.neo4j;
 
+import java.util.Arrays;
+
 import org.neo4j.graphdb.Node;
 import org.neo4j.spatial.core.CRS;
 import org.neo4j.spatial.core.Point;
-import org.neo4j.values.storable.CoordinateReferenceSystem;
-
-import java.util.Arrays;
-import java.util.List;
 
 import static java.lang.String.format;
 
 class Neo4jPoint implements Point {
     private final Node node;
-    private final static String property = "location";
 
     public Neo4jPoint(Node node) {
         this.node = node;
@@ -29,7 +26,7 @@ class Neo4jPoint implements Point {
 
     @Override
     public double[] getCoordinate() {
-        org.neo4j.graphdb.spatial.Point location = (org.neo4j.graphdb.spatial.Point) this.node.getProperty(property);
+        org.neo4j.graphdb.spatial.Point location = (org.neo4j.graphdb.spatial.Point) this.node.getProperty(PROPERTY);
         return location.getCoordinate().getCoordinate().clone();
     }
 
@@ -39,7 +36,7 @@ class Neo4jPoint implements Point {
     }
 
     public org.neo4j.graphdb.spatial.CRS getNeo4jCRS() {
-        return ((org.neo4j.graphdb.spatial.Point) this.node.getProperty(property)).getCRS();
+        return ((org.neo4j.graphdb.spatial.Point) this.node.getProperty(PROPERTY)).getCRS();
     }
 
     @Override

@@ -24,7 +24,7 @@ public interface LineSegment extends HasCRS {
     static Point sharedPoint(LineSegment a, LineSegment b) {
         for (Point aPoint : a.getPoints()) {
             for (Point bPoint : b.getPoints()) {
-                if (AlgoUtil.equal(aPoint.getCoordinate(), bPoint.getCoordinate())) {
+                if (AlgoUtil.isEqual(aPoint.getCoordinate(), bPoint.getCoordinate())) {
                     return Point.point(aPoint.getCRS(), aPoint.getCoordinate());
                 }
             }
@@ -58,9 +58,6 @@ class InMemoryLineSegment implements LineSegment {
         if (a.dimension() != b.dimension()) {
             throw new IllegalArgumentException("Cannot create line segment from points with different dimensions");
         }
-//        if (a.getCRS() != b.getCRS()) {
-//            throw new IllegalArgumentException("Cannot create line segment from points with different coordinate reference systems");
-//        }
         this.points = new Point[]{a,b};
     }
 
@@ -69,7 +66,8 @@ class InMemoryLineSegment implements LineSegment {
             return false;
         }
 
-        int a, b;
+        int a;
+        int b;
         a = b = -1;
         for (int i = 0; i < 2; i++) {
             if (this.points[0].equals(other.getPoints()[i])) {
@@ -80,11 +78,17 @@ class InMemoryLineSegment implements LineSegment {
             }
         }
 
-        return AlgoUtil.lessOrEqual(0, a) && AlgoUtil.lessOrEqual(0, b) && !AlgoUtil.equal(a, b);
+        return AlgoUtil.lessOrEqual(0, a) && AlgoUtil.lessOrEqual(0, b) && !AlgoUtil.isEqual(a, b);
     }
 
+    @Override
     public boolean equals(Object other) {
-        return other instanceof LineSegment && this.equals((LineSegment) other);
+        return other instanceof LineSegment lineSegment && this.equals(lineSegment);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(points);
     }
 
     @Override

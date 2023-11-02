@@ -10,6 +10,9 @@ public class CCWCalculator {
     private static CartesianCCW cartesian;
     private static WGS84CCW wgs84;
 
+    private CCWCalculator() {
+    }
+
     private static CCW getCartesian() {
         if (cartesian == null) {
             cartesian = new CartesianCCW();
@@ -25,7 +28,7 @@ public class CCWCalculator {
     }
 
     public static CCW getCalculator(CRS crs) {
-        if (crs == CRS.Cartesian) {
+        if (crs == CRS.CARTESIAN) {
             return getCartesian();
         } else {
             return getWGS84();
@@ -33,7 +36,7 @@ public class CCWCalculator {
     }
 
     public static CCW getCalculator(Polygon.SimplePolygon polygon) {
-        if (polygon.getCRS() == CRS.Cartesian) {
+        if (polygon.getCRS() == CRS.CARTESIAN) {
             return getCartesian();
         } else {
             return getWGS84();
@@ -41,7 +44,7 @@ public class CCWCalculator {
     }
 
     public static CCW getCalculator(Point[] points) {
-        if (points[0].getCRS() == CRS.Cartesian) {
+        if (points[0].getCRS() == CRS.CARTESIAN) {
             return getCartesian();
         } else {
             return getWGS84();

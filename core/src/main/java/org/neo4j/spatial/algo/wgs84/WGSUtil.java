@@ -3,13 +3,15 @@ package org.neo4j.spatial.algo.wgs84;
 import org.neo4j.spatial.algo.AlgoUtil;
 import org.neo4j.spatial.core.LineSegment;
 import org.neo4j.spatial.core.Point;
-import org.neo4j.spatial.core.Polygon;
 import org.neo4j.spatial.core.Vector;
 
 public class WGSUtil {
-    public final static Vector NORTH_POLE = new Vector(0, 0, 1);
-    public final static Vector SOUTH_POLE = new Vector(0, 0, -1);
-    public final static double RADIUS = 6371e3;;
+    public static final Vector NORTH_POLE = new Vector(0, 0, 1);
+    public static final Vector SOUTH_POLE = new Vector(0, 0, -1);
+    public static final double RADIUS = 6371e3;
+
+    private WGSUtil() {
+    }
 
     public static double initialBearing(Point start, Point end) {
         Vector a = new Vector(start);
@@ -117,7 +119,7 @@ public class WGSUtil {
         double thetaIE = Math.acos(i.dot(e) / (i.magnitude() * e.magnitude()));
         double thetaSE = Math.acos(s.dot(e) / (s.magnitude() * e.magnitude()));
 
-        return AlgoUtil.equal(thetaSI + thetaIE, thetaSE);
+        return AlgoUtil.isEqual(thetaSI + thetaIE, thetaSE);
     }
 
     /**

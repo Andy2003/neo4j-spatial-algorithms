@@ -23,13 +23,14 @@ import org.neo4j.values.storable.Values;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static org.neo4j.spatial.core.Polygon.RELATION_OSM_ID;
 import static org.neo4j.spatial.neo4j.CRSConverter.toNeo4jCRS;
 
 public class UserDefinedFunctions {
 
     @Context
     public Log log;
-    
+
     @Context
     public Transaction tx;
 
@@ -53,7 +54,7 @@ public class UserDefinedFunctions {
     public Stream<PointArraySizeResult> createArrayCache(@Name("main") Node main) {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("main", main.getElementId());
-        long relation_osm_id = (long) main.getProperty("relation_osm_id");
+        long relationOsmId = (long) main.getProperty(RELATION_OSM_ID);
 
         Result mainResult = tx.execute("MATCH (p:Polygon)<-[:POLYGON_STRUCTURE*]-(m:OSMRelation) WHERE elementId(m)=$main RETURN p AS polygonNode", parameters);
         if (!mainResult.hasNext()) {
@@ -73,7 +74,7 @@ public class UserDefinedFunctions {
             }
 
             Node startNode = (Node) startNodeResult.next().get("startNode");
-            Neo4jSimpleGraphNodePolygon polygon = new Neo4jSimpleGraphNodePolygon(startNode, relation_osm_id);
+            Neo4jSimpleGraphNodePolygon polygon = new Neo4jSimpleGraphNodePolygon(startNode, relationOsmId);
             Point[] polygonPoints = Arrays.stream(polygon.getPoints()).map(p -> Values.pointValue(CoordinateReferenceSystem.WGS_84, p.getCoordinate())).toArray(Point[]::new);
             result.add(new PointArraySizeResult(polygonNode.getElementId(), polygonPoints.length));
             polygonNode.setProperty("polygon", polygonPoints);
@@ -87,7 +88,7 @@ public class UserDefinedFunctions {
     public Stream<PointArraySizeResult> createArrayLine(@Name("main") Node main) {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("main", main.getElementId());
-        long relation_osm_id = (long) main.getProperty("relation_osm_id");
+        long relationOsmId = (long) main.getProperty(RELATION_OSM_ID);
 
         Result mainResult = tx.execute("MATCH (p:Polyline)<-[:POLYLINE_STRUCTURE*]-(m:OSMRelation) WHERE elementId(m)=$main RETURN p AS polylineNode", parameters);
         if (!mainResult.hasNext()) {
@@ -109,7 +110,7 @@ public class UserDefinedFunctions {
 
             try {
                 Node startNode = (Node) startNodeResult.next().get("startNode");
-                Neo4jSimpleGraphNodePolyline polyline = new Neo4jSimpleGraphNodePolyline(startNode, relation_osm_id);
+                Neo4jSimpleGraphNodePolyline polyline = new Neo4jSimpleGraphNodePolyline(startNode, relationOsmId);
                 Point[] polylinePoints = Arrays.stream(polyline.getPoints()).map(p -> Values.pointValue(CoordinateReferenceSystem.WGS_84, p.getCoordinate())).toArray(Point[]::new);
                 result.add(new PointArraySizeResult(polylineNode.getElementId(), polylinePoints.length));
                 polylineNode.setProperty("polyline", polylinePoints);
@@ -132,7 +133,7 @@ public class UserDefinedFunctions {
     public void createOSMGraphGeometries(
             @Name("main") Node main,
             @Name(value = "proximityThreshold", defaultValue = "250") double proximityThreshold) {
-        long id = (long) main.getProperty("relation_osm_id");
+        long id = (long) main.getProperty(RELATION_OSM_ID);
 
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put("id", id);
@@ -170,7 +171,7 @@ public class UserDefinedFunctions {
     }
 
     public static MultiPolygon getGraphNodePolygon(Node main) {
-        long relationId = (long) main.getProperty("relation_osm_id");
+        long relationId = (long) main.getProperty(RELATION_OSM_ID);
         MultiPolygon multiPolygon = new MultiPolygon();
         insertChildrenGraphNode(main, multiPolygon, relationId);
 
@@ -211,7 +212,7 @@ public class UserDefinedFunctions {
     }
 
     public static MultiPolyline getArrayPolyline(Node main) {
-        long relationId = (long) main.getProperty("relation_osm_id");
+        long relationId = (long) main.getProperty(RELATION_OSM_ID);
         MultiPolyline multiPolyline = new MultiPolyline();
 
         for (Relationship relationship : main.getRelationships(Direction.OUTGOING, Relation.POLYLINE_STRUCTURE)) {
@@ -224,7 +225,7 @@ public class UserDefinedFunctions {
     }
 
     public static MultiPolyline getGraphNodePolyline(Node main) {
-        long relationId = (long) main.getProperty("relation_osm_id");
+        long relationId = (long) main.getProperty(RELATION_OSM_ID);
         MultiPolyline multiPolyline = new MultiPolyline();
 
         for (Relationship relationship : main.getRelationships(Direction.OUTGOING, Relation.POLYLINE_STRUCTURE)) {
@@ -282,9 +283,9 @@ public class UserDefinedFunctions {
     public Stream<PointResult> intersectionGraphPolygonPolyline(@Name("polygonMain") Node polygonMain, @Name("polylineMain") Node polylineMain, @Name("variant") String variantString) {
         IntersectCalculator.AlgorithmVariant variant;
         if (variantString.equals("Naive")) {
-            variant = IntersectCalculator.AlgorithmVariant.Naive;
+            variant = IntersectCalculator.AlgorithmVariant.NAIVE;
         } else if (variantString.equals("MCSweepLine")) {
-            variant = IntersectCalculator.AlgorithmVariant.MCSweepLine;
+            variant = IntersectCalculator.AlgorithmVariant.MC_SWEEP_LINE;
         } else {
             throw new IllegalArgumentException("Illegal algorithm variant. Choose 'Naive' or 'MCSweepLine'");
         }
@@ -470,10 +471,10 @@ public class UserDefinedFunctions {
             throw new IllegalArgumentException("Invalid 'polygon2', should be a list of at least 3, but was: " + polygon2.size());
         }
 
-        CRS CRS1 = polygon1.get(0).getCRS();
-        CRS CRS2 = polygon2.get(0).getCRS();
-        if (!CRS1.equals(CRS2)) {
-            throw new IllegalArgumentException("Cannot compare geometries of different CRS: " + CRS1 + " !+ " + CRS2);
+        CRS crs1 = polygon1.get(0).getCRS();
+        CRS crs2 = polygon2.get(0).getCRS();
+        if (!crs1.equals(crs2)) {
+            throw new IllegalArgumentException("Cannot compare geometries of different CRS: " + crs1 + " !+ " + crs2);
         }
     }
 
@@ -512,13 +513,13 @@ public class UserDefinedFunctions {
         return new Neo4jPoint(crs, new Coordinate(coords));
     }
 
-    private class Neo4jPoint implements Point {
+    private static class Neo4jPoint implements Point {
         private final List<Coordinate> coordinates;
         private final CRS crs;
 
         private Neo4jPoint(CRS crs, Coordinate coordinate) {
             this.crs = crs;
-            this.coordinates = Arrays.asList(coordinate);
+            this.coordinates = Collections.singletonList(coordinate);
         }
 
         @Override
@@ -532,21 +533,33 @@ public class UserDefinedFunctions {
         }
     }
 
-    public class PointResult {
-        public Point point;
+    public static class PointResult {
+        private final Point point;
 
         private PointResult(Point point) {
             this.point = point;
         }
+
+        public Point getPoint() {
+            return point;
+        }
     }
 
-    public class PointArraySizeResult {
-        public String node_id;
-        public long count;
+    public static class PointArraySizeResult {
+        private final String nodeId;
+        private final long count;
 
-        private PointArraySizeResult(String node_id, long count) {
-            this.node_id = node_id;
+        private PointArraySizeResult(String nodeId, long count) {
+            this.nodeId = nodeId;
             this.count = count;
+        }
+
+        public String getNodeId() {
+            return nodeId;
+        }
+
+        public long getCount() {
+            return count;
         }
     }
 }

@@ -44,18 +44,18 @@ public class IntersectCalculator {
     }
 
     public static Intersect getCalculator(CRS crs) {
-        return getCalculator(crs, AlgorithmVariant.Naive);
+        return getCalculator(crs, AlgorithmVariant.NAIVE);
     }
 
     public static Intersect getCalculator(CRS crs, AlgorithmVariant variant) {
-        if (crs == CRS.Cartesian) {
-            if (variant == AlgorithmVariant.Naive) {
+        if (crs == CRS.CARTESIAN) {
+            if (variant == AlgorithmVariant.NAIVE) {
                 return getCartesianNaive();
             } else {
                 return getCartesianSweep();
             }
         } else {
-            if (variant == AlgorithmVariant.Naive) {
+            if (variant == AlgorithmVariant.NAIVE) {
                 return getWGS84Naive();
             } else {
                 return getWGS84Sweep();
@@ -64,18 +64,18 @@ public class IntersectCalculator {
     }
 
     public static Intersect getCalculator(Polygon a) {
-        return getCalculator(a, AlgorithmVariant.Naive);
+        return getCalculator(a, AlgorithmVariant.NAIVE);
     }
 
     public static Intersect getCalculator(Polygon a, AlgorithmVariant variant) {
-        if (a.getCRS() == CRS.Cartesian) {
-            if (variant == AlgorithmVariant.Naive) {
+        if (a.getCRS() == CRS.CARTESIAN) {
+            if (variant == AlgorithmVariant.NAIVE) {
                 return getCartesianNaive();
             } else {
                 return getCartesianSweep();
             }
         } else {
-            if (variant == AlgorithmVariant.Naive) {
+            if (variant == AlgorithmVariant.NAIVE) {
                 return getWGS84Naive();
             } else {
                 return getWGS84Sweep();
@@ -84,18 +84,18 @@ public class IntersectCalculator {
     }
 
     public static Intersect getCalculator(MultiPolyline a) {
-        return getCalculator(a, AlgorithmVariant.Naive);
+        return getCalculator(a, AlgorithmVariant.NAIVE);
     }
 
     public static Intersect getCalculator(MultiPolyline a, AlgorithmVariant variant) {
-        if (a.getCRS() == CRS.Cartesian) {
-            if (variant == AlgorithmVariant.Naive) {
+        if (a.getCRS() == CRS.CARTESIAN) {
+            if (variant == AlgorithmVariant.NAIVE) {
                 return getCartesianNaive();
             } else {
                 return getCartesianSweep();
             }
         } else {
-            if (variant == AlgorithmVariant.Naive) {
+            if (variant == AlgorithmVariant.NAIVE) {
                 return getWGS84Naive();
             } else {
                 return getWGS84Sweep();
@@ -104,18 +104,18 @@ public class IntersectCalculator {
     }
 
     public static Intersect getCalculator(Polyline a) {
-        return getCalculator(a, AlgorithmVariant.Naive);
+        return getCalculator(a, AlgorithmVariant.NAIVE);
     }
 
     public static Intersect getCalculator(Polyline a, AlgorithmVariant variant) {
-        if (a.getCRS() == CRS.Cartesian) {
-            if (variant == AlgorithmVariant.Naive) {
+        if (a.getCRS() == CRS.CARTESIAN) {
+            if (variant == AlgorithmVariant.NAIVE) {
                 return getCartesianNaive();
             } else {
                 return getCartesianSweep();
             }
         } else {
-            if (variant == AlgorithmVariant.Naive) {
+            if (variant == AlgorithmVariant.NAIVE) {
                 return getWGS84Naive();
             } else {
                 return getWGS84Sweep();
@@ -124,6 +124,6 @@ public class IntersectCalculator {
     }
 
     public enum AlgorithmVariant {
-        Naive, MCSweepLine
+        NAIVE, MC_SWEEP_LINE
     }
 }

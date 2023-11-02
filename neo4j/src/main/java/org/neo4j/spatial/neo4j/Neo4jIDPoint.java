@@ -11,6 +11,7 @@ import org.neo4j.spatial.core.CRS;
 import org.neo4j.spatial.core.Point;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import static java.lang.String.format;
 
@@ -19,7 +20,6 @@ class Neo4jIDPoint implements Point {
     private final KernelTransaction ktx;
 
     private static int propertyId = -1;
-    private final static String property = "location";
 
     public Neo4jIDPoint(long nodeId, KernelTransaction ktx) {
         this.nodeId = nodeId;
@@ -30,12 +30,19 @@ class Neo4jIDPoint implements Point {
         }
     }
 
+    @Override
     public boolean equals(Point other) {
         return Arrays.equals(this.getCoordinate(), other.getCoordinate());
     }
 
+    @Override
     public boolean equals(Object other) {
-        return other instanceof Point && this.equals((Point) other);
+        return other instanceof Point point && this.equals(point);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nodeId);
     }
 
     @Override
@@ -61,7 +68,7 @@ class Neo4jIDPoint implements Point {
 
     @Override
     public CRS getCRS() {
-        CRS crs = CRS.Cartesian;
+        CRS crs = CRS.CARTESIAN;
         try ( NodeCursor nodeCursor = ktx.cursors().allocateNodeCursor(CursorContext.NULL_CONTEXT);
               PropertyCursor propertyCursor = ktx.cursors().allocatePropertyCursor(CursorContext.NULL_CONTEXT, EmptyMemoryTracker.INSTANCE) ) {
             ktx.dataRead().singleNode(nodeId, nodeCursor);
@@ -84,7 +91,7 @@ class Neo4jIDPoint implements Point {
     private void getPropertyId() {
         String[] properties = Iterators.stream(TokenAccess.PROPERTY_KEYS.inUse(ktx.dataRead(), ktx.schemaRead(), ktx.tokenRead())).toArray(String[]::new);
         for (int i = 0; i < properties.length; i++) {
-            if (properties[i].equals(property)) {
+            if (properties[i].equals(PROPERTY)) {
                 propertyId = i;
                 return;
             }

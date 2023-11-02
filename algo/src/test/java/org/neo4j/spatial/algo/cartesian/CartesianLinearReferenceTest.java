@@ -16,13 +16,13 @@ public class CartesianLinearReferenceTest {
 
     @Test
     public void referenceLineSegment() {
-        LineSegment l = LineSegment.lineSegment(Point.point(CRS.Cartesian, 0, 0), Point.point(CRS.Cartesian, 10, 10));
+        LineSegment l = LineSegment.lineSegment(Point.point(CRS.CARTESIAN, 0, 0), Point.point(CRS.CARTESIAN, 10, 10));
 
-        LinearReference calculator = LinearReferenceCalculator.getCalculator(CRS.Cartesian);
+        LinearReference calculator = LinearReferenceCalculator.getCalculator(CRS.CARTESIAN);
 
-        assertThat(calculator.reference(l, 0), equalTo(Point.point(CRS.Cartesian, 0, 0)));
-        assertThat(calculator.reference(l, Math.sqrt(200)/2), equalTo(Point.point(CRS.Cartesian, 5, 5)));
-        assertThat(calculator.reference(l, Math.sqrt(200)), equalTo(Point.point(CRS.Cartesian, 10, 10)));
+        assertThat(calculator.reference(l, 0), equalTo(Point.point(CRS.CARTESIAN, 0, 0)));
+        assertThat(calculator.reference(l, Math.sqrt(200)/2), equalTo(Point.point(CRS.CARTESIAN, 5, 5)));
+        assertThat(calculator.reference(l, Math.sqrt(200)), equalTo(Point.point(CRS.CARTESIAN, 10, 10)));
         assertThat(calculator.reference(l, 100), is(nullValue()));
         assertThat(calculator.reference(l, -1), is(nullValue()));
     }
@@ -30,76 +30,76 @@ public class CartesianLinearReferenceTest {
     @Test
     public void referencePolygon() {
         Polygon.SimplePolygon p = Polygon.simple(
-                Point.point(CRS.Cartesian, -10, -10),
-                Point.point(CRS.Cartesian, 10, -10),
-                Point.point(CRS.Cartesian, 10, 10),
-                Point.point(CRS.Cartesian, -10, 10)
+                Point.point(CRS.CARTESIAN, -10, -10),
+                Point.point(CRS.CARTESIAN, 10, -10),
+                Point.point(CRS.CARTESIAN, 10, 10),
+                Point.point(CRS.CARTESIAN, -10, 10)
         );
 
-        LinearReference calculator = LinearReferenceCalculator.getCalculator(CRS.Cartesian);
+        LinearReference calculator = LinearReferenceCalculator.getCalculator(CRS.CARTESIAN);
 
         Point[] expected;
 
         //Forward
         expected = new Point[]{
-            Point.point(CRS.Cartesian, -10, -10)
+            Point.point(CRS.CARTESIAN, -10, -10)
         };
         assertThat(calculator.reference(p, p.getPoints()[0], p.getPoints()[1], 0), equalTo(expected));
 
         expected = new Point[]{
-                Point.point(CRS.Cartesian, -10, -10),
-                Point.point(CRS.Cartesian, 0, -10)
+                Point.point(CRS.CARTESIAN, -10, -10),
+                Point.point(CRS.CARTESIAN, 0, -10)
         };
         assertThat(calculator.reference(p, p.getPoints()[0], p.getPoints()[1], 10), equalTo(expected));
 
         expected = new Point[]{
-                Point.point(CRS.Cartesian, -10, -10),
-                Point.point(CRS.Cartesian, 10, -10),
-                Point.point(CRS.Cartesian, 10, -5)
+                Point.point(CRS.CARTESIAN, -10, -10),
+                Point.point(CRS.CARTESIAN, 10, -10),
+                Point.point(CRS.CARTESIAN, 10, -5)
         };
         assertThat(calculator.reference(p, p.getPoints()[0], p.getPoints()[1], 25), equalTo(expected));
 
         expected = new Point[]{
-                Point.point(CRS.Cartesian, -10, -10),
-                Point.point(CRS.Cartesian, 10, -10),
-                Point.point(CRS.Cartesian, 10, 10),
-                Point.point(CRS.Cartesian, -10, 10),
-                Point.point(CRS.Cartesian, -10, -10),
-                Point.point(CRS.Cartesian, 10, -10),
-                Point.point(CRS.Cartesian, 10, 10),
-                Point.point(CRS.Cartesian, 5, 10)
+                Point.point(CRS.CARTESIAN, -10, -10),
+                Point.point(CRS.CARTESIAN, 10, -10),
+                Point.point(CRS.CARTESIAN, 10, 10),
+                Point.point(CRS.CARTESIAN, -10, 10),
+                Point.point(CRS.CARTESIAN, -10, -10),
+                Point.point(CRS.CARTESIAN, 10, -10),
+                Point.point(CRS.CARTESIAN, 10, 10),
+                Point.point(CRS.CARTESIAN, 5, 10)
         };
         assertThat(calculator.reference(p, p.getPoints()[0], p.getPoints()[1], 125), equalTo(expected));
         assertThat(calculator.reference(p, p.getPoints()[0], p.getPoints()[1], -1), is(nullValue()));
 
         //Backward
         expected = new Point[]{
-                Point.point(CRS.Cartesian, -10, -10)
+                Point.point(CRS.CARTESIAN, -10, -10)
         };
         assertThat(calculator.reference(p, p.getPoints()[0], p.getPoints()[3], 0), equalTo(expected));
 
         expected = new Point[]{
-                Point.point(CRS.Cartesian, -10, -10),
-                Point.point(CRS.Cartesian, -10, 0)
+                Point.point(CRS.CARTESIAN, -10, -10),
+                Point.point(CRS.CARTESIAN, -10, 0)
         };
         assertThat(calculator.reference(p, p.getPoints()[0], p.getPoints()[3], 10), equalTo(expected));
 
         expected = new Point[]{
-                Point.point(CRS.Cartesian, -10, -10),
-                Point.point(CRS.Cartesian, -10, 10),
-                Point.point(CRS.Cartesian, -5, 10)
+                Point.point(CRS.CARTESIAN, -10, -10),
+                Point.point(CRS.CARTESIAN, -10, 10),
+                Point.point(CRS.CARTESIAN, -5, 10)
         };
         assertThat(calculator.reference(p, p.getPoints()[0], p.getPoints()[3], 25), equalTo(expected));
 
         expected = new Point[]{
-                Point.point(CRS.Cartesian, -10, -10),
-                Point.point(CRS.Cartesian, -10, 10),
-                Point.point(CRS.Cartesian, 10, 10),
-                Point.point(CRS.Cartesian, 10, -10),
-                Point.point(CRS.Cartesian, -10, -10),
-                Point.point(CRS.Cartesian, -10, 10),
-                Point.point(CRS.Cartesian, 10, 10),
-                Point.point(CRS.Cartesian, 10, 5)
+                Point.point(CRS.CARTESIAN, -10, -10),
+                Point.point(CRS.CARTESIAN, -10, 10),
+                Point.point(CRS.CARTESIAN, 10, 10),
+                Point.point(CRS.CARTESIAN, 10, -10),
+                Point.point(CRS.CARTESIAN, -10, -10),
+                Point.point(CRS.CARTESIAN, -10, 10),
+                Point.point(CRS.CARTESIAN, 10, 10),
+                Point.point(CRS.CARTESIAN, 10, 5)
         };
         assertThat(calculator.reference(p, p.getPoints()[0], p.getPoints()[3], 125), equalTo(expected));
         assertThat(calculator.reference(p, p.getPoints()[0], p.getPoints()[3], -1), is(nullValue()));
@@ -108,31 +108,31 @@ public class CartesianLinearReferenceTest {
     @Test
     public void referencePolyline() {
         Polyline p = Polyline.polyline(
-                Point.point(CRS.Cartesian, -10, -10),
-                Point.point(CRS.Cartesian, 10, -10),
-                Point.point(CRS.Cartesian, 10, 10),
-                Point.point(CRS.Cartesian, -10, 10)
+                Point.point(CRS.CARTESIAN, -10, -10),
+                Point.point(CRS.CARTESIAN, 10, -10),
+                Point.point(CRS.CARTESIAN, 10, 10),
+                Point.point(CRS.CARTESIAN, -10, 10)
         );
 
-        LinearReference calculator = LinearReferenceCalculator.getCalculator(CRS.Cartesian);
+        LinearReference calculator = LinearReferenceCalculator.getCalculator(CRS.CARTESIAN);
 
         Point[] expected;
 
         //Forward
         expected = new Point[]{
-                Point.point(CRS.Cartesian, -10, -10)
+                Point.point(CRS.CARTESIAN, -10, -10)
         };
         assertThat(calculator.reference(p, p.getPoints()[0], p.getPoints()[1], 0), equalTo(expected));
 
-        expected = new Point[]{                Point.point(CRS.Cartesian, -10, -10),
-                Point.point(CRS.Cartesian, 0, -10)
+        expected = new Point[]{                Point.point(CRS.CARTESIAN, -10, -10),
+                Point.point(CRS.CARTESIAN, 0, -10)
         };
         assertThat(calculator.reference(p, p.getPoints()[0], p.getPoints()[1], 10), equalTo(expected));
 
         expected = new Point[]{
-                Point.point(CRS.Cartesian, -10, -10),
-                Point.point(CRS.Cartesian, 10, -10),
-                Point.point(CRS.Cartesian, 10, -5)
+                Point.point(CRS.CARTESIAN, -10, -10),
+                Point.point(CRS.CARTESIAN, 10, -10),
+                Point.point(CRS.CARTESIAN, 10, -5)
         };
         assertThat(calculator.reference(p, p.getPoints()[0], p.getPoints()[1], 25), equalTo(expected));
         assertThat(calculator.reference(p, p.getPoints()[0], p.getPoints()[1], 125), is(nullValue()));
@@ -141,20 +141,20 @@ public class CartesianLinearReferenceTest {
         //Backward
 
         expected = new Point[]{
-                Point.point(CRS.Cartesian, -10, 10)
+                Point.point(CRS.CARTESIAN, -10, 10)
         };
         assertThat(calculator.reference(p, p.getPoints()[3], p.getPoints()[2], 0), equalTo(expected));
 
         expected = new Point[]{
-                Point.point(CRS.Cartesian, -10, 10),
-                Point.point(CRS.Cartesian, 0, 10)
+                Point.point(CRS.CARTESIAN, -10, 10),
+                Point.point(CRS.CARTESIAN, 0, 10)
         };
         assertThat(calculator.reference(p, p.getPoints()[3], p.getPoints()[2], 10), equalTo(expected));
 
         expected = new Point[]{
-                Point.point(CRS.Cartesian, -10, 10),
-                Point.point(CRS.Cartesian, 10, 10),
-                Point.point(CRS.Cartesian, 10, 5)
+                Point.point(CRS.CARTESIAN, -10, 10),
+                Point.point(CRS.CARTESIAN, 10, 10),
+                Point.point(CRS.CARTESIAN, 10, 5)
         };
         assertThat(calculator.reference(p, p.getPoints()[3], p.getPoints()[2], 25), equalTo(expected));
         assertThat(calculator.reference(p, p.getPoints()[3], p.getPoints()[2], 125), is(nullValue()));

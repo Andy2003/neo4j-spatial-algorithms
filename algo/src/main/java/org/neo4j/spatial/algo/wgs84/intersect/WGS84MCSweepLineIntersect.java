@@ -1,11 +1,14 @@
 package org.neo4j.spatial.algo.wgs84.intersect;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.neo4j.spatial.algo.AlgoUtil;
 import org.neo4j.spatial.algo.wgs84.WGSUtil;
 import org.neo4j.spatial.core.*;
-
-import java.util.*;
-import java.util.stream.Stream;
 
 public class WGS84MCSweepLineIntersect extends WGS84Intersect {
     private List<MonotoneChain> activeChainList;
@@ -36,9 +39,8 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
             return new WGS84NaiveIntersect().doesIntersect(a, b);
         }
 
-        List<MonotoneChain> inputList = new ArrayList<>();
         Pair<List<MonotoneChain>, List<LineSegment>> aPair = getMonotoneChains(aPolygons, true);
-        inputList.addAll(aPair.first());
+        List<MonotoneChain> inputList = new ArrayList<>(aPair.first());
         Pair<List<MonotoneChain>, List<LineSegment>> bPair = getMonotoneChains(bPolygons, false);
         inputList.addAll(bPair.first());
 
@@ -59,9 +61,8 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
             return new WGS84NaiveIntersect().intersect(a, b);
         }
 
-        List<MonotoneChain> inputList = new ArrayList<>();
         Pair<List<MonotoneChain>, List<LineSegment>> aPair = getMonotoneChains(aPolygons, true);
-        inputList.addAll(aPair.first());
+        List<MonotoneChain> inputList = new ArrayList<>(aPair.first());
         Pair<List<MonotoneChain>, List<LineSegment>> bPair = getMonotoneChains(bPolygons, false);
         inputList.addAll(bPair.first());
 
@@ -82,9 +83,8 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
             return new WGS84NaiveIntersect().doesIntersect(a, b);
         }
 
-        List<MonotoneChain> inputList = new ArrayList<>();
         Pair<List<MonotoneChain>, List<LineSegment>> aPair = getMonotoneChains(aPolygons, true);
-        inputList.addAll(aPair.first());
+        List<MonotoneChain> inputList = new ArrayList<>(aPair.first());
         Pair<List<MonotoneChain>, List<LineSegment>> bPair = getMonotoneChains(bPolylines, false);
         inputList.addAll(bPair.first());
 
@@ -105,9 +105,8 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
             return new WGS84NaiveIntersect().intersect(a, b);
         }
 
-        List<MonotoneChain> inputList = new ArrayList<>();
         Pair<List<MonotoneChain>, List<LineSegment>> aPair = getMonotoneChains(aPolygons, true);
-        inputList.addAll(aPair.first());
+        List<MonotoneChain> inputList = new ArrayList<>(aPair.first());
         Pair<List<MonotoneChain>, List<LineSegment>> bPair = getMonotoneChains(bPolylines, false);
         inputList.addAll(bPair.first());
 
@@ -123,14 +122,13 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
         initialize();
         Polygon.SimplePolygon[] aPolygons = getSimplePolygons(polygon);
 
-        if (!validate(aPolygons) || !validate(new Polyline[]{polyline})) {
+        if (!validate(aPolygons) || !validate(new Polyline[]{ polyline })) {
             return new WGS84NaiveIntersect().doesIntersect(polygon, polyline);
         }
 
-        List<MonotoneChain> inputList = new ArrayList<>();
         Pair<List<MonotoneChain>, List<LineSegment>> aPair = getMonotoneChains(aPolygons, true);
-        inputList.addAll(aPair.first());
-        Pair<List<MonotoneChain>, List<LineSegment>> bPair = getMonotoneChains(new Polyline[]{polyline}, false);
+        List<MonotoneChain> inputList = new ArrayList<>(aPair.first());
+        Pair<List<MonotoneChain>, List<LineSegment>> bPair = getMonotoneChains(new Polyline[]{ polyline }, false);
         inputList.addAll(bPair.first());
 
         //Check the vertical intersections
@@ -145,14 +143,13 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
         initialize();
         Polygon.SimplePolygon[] aPolygons = getSimplePolygons(a);
 
-        if (!validate(aPolygons) || !validate(new Polyline[]{b})) {
+        if (!validate(aPolygons) || !validate(new Polyline[]{ b })) {
             return new WGS84NaiveIntersect().intersect(a, b);
         }
 
-        List<MonotoneChain> inputList = new ArrayList<>();
         Pair<List<MonotoneChain>, List<LineSegment>> aPair = getMonotoneChains(aPolygons, true);
-        inputList.addAll(aPair.first());
-        Pair<List<MonotoneChain>, List<LineSegment>> bPair = getMonotoneChains(new Polyline[]{b}, false);
+        List<MonotoneChain> inputList = new ArrayList<>(aPair.first());
+        Pair<List<MonotoneChain>, List<LineSegment>> bPair = getMonotoneChains(new Polyline[]{ b }, false);
         inputList.addAll(bPair.first());
 
         //Check the vertical intersections
@@ -172,9 +169,8 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
             return new WGS84NaiveIntersect().intersect(a, b);
         }
 
-        List<MonotoneChain> inputList = new ArrayList<>();
         Pair<List<MonotoneChain>, List<LineSegment>> aPair = getMonotoneChains(aPolylines, true);
-        inputList.addAll(aPair.first());
+        List<MonotoneChain> inputList = new ArrayList<>(aPair.first());
         Pair<List<MonotoneChain>, List<LineSegment>> bPair = getMonotoneChains(bPolylines, false);
         inputList.addAll(bPair.first());
 
@@ -190,14 +186,13 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
         initialize();
         Polyline[] aPolylines = a.getChildren();
 
-        if (!validate(aPolylines) || !validate(new Polyline[]{b})) {
+        if (!validate(aPolylines) || !validate(new Polyline[]{ b })) {
             return new WGS84NaiveIntersect().intersect(a, b);
         }
 
-        List<MonotoneChain> inputList = new ArrayList<>();
         Pair<List<MonotoneChain>, List<LineSegment>> aPair = getMonotoneChains(aPolylines, true);
-        inputList.addAll(aPair.first());
-        Pair<List<MonotoneChain>, List<LineSegment>> bPair = getMonotoneChains(new Polyline[]{b}, false);
+        List<MonotoneChain> inputList = new ArrayList<>(aPair.first());
+        Pair<List<MonotoneChain>, List<LineSegment>> bPair = getMonotoneChains(new Polyline[]{ b }, false);
         inputList.addAll(bPair.first());
 
         //Check the vertical intersections
@@ -212,9 +207,8 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
         initialize();
         Polyline[] aPolylines = a.getChildren();
 
-        List<MonotoneChain> inputList = new ArrayList<>();
         Pair<List<MonotoneChain>, List<LineSegment>> aPair = getMonotoneChains(aPolylines, true);
-        inputList.addAll(aPair.first());
+        List<MonotoneChain> inputList = new ArrayList<>(aPair.first());
 
         if (WGS84MonotoneChainPartitioner.getXDirection(b) == 0) {
             ArrayList<LineSegment> verticals = new ArrayList<>();
@@ -234,14 +228,13 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
     public Point[] intersect(Polyline a, Polyline b) {
         initialize();
 
-        if (!validate(new Polyline[]{a}) || !validate(new Polyline[]{b})) {
+        if (!validate(new Polyline[]{ a }) || !validate(new Polyline[]{ b })) {
             return new WGS84NaiveIntersect().intersect(a, b);
         }
 
-        List<MonotoneChain> inputList = new ArrayList<>();
-        Pair<List<MonotoneChain>, List<LineSegment>> aPair = getMonotoneChains(new Polyline[]{a}, true);
-        inputList.addAll(aPair.first());
-        Pair<List<MonotoneChain>, List<LineSegment>> bPair = getMonotoneChains(new Polyline[]{b}, false);
+        Pair<List<MonotoneChain>, List<LineSegment>> aPair = getMonotoneChains(new Polyline[]{ a }, true);
+        List<MonotoneChain> inputList = new ArrayList<>(aPair.first());
+        Pair<List<MonotoneChain>, List<LineSegment>> bPair = getMonotoneChains(new Polyline[]{ b }, false);
         inputList.addAll(bPair.first());
 
         //Check the vertical intersections
@@ -255,9 +248,8 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
     public Point[] intersect(Polyline a, LineSegment b) {
         initialize();
 
-        List<MonotoneChain> inputList = new ArrayList<>();
-        Pair<List<MonotoneChain>, List<LineSegment>> aPair = getMonotoneChains(new Polyline[]{a}, true);
-        inputList.addAll(aPair.first());
+        Pair<List<MonotoneChain>, List<LineSegment>> aPair = getMonotoneChains(new Polyline[]{ a }, true);
+        List<MonotoneChain> inputList = new ArrayList<>(aPair.first());
 
         if (WGS84MonotoneChainPartitioner.getXDirection(b) == 0) {
             ArrayList<LineSegment> verticals = new ArrayList<>();
@@ -275,7 +267,8 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
 
     /**
      * Checks the validness of the polygons. A polygon is invalid if it is around a pole or crosses the Date line
-     * @param polygons
+     *
+     * @param polygons The polygons to check
      * @return True iff none of the polygons are invalid
      */
     private boolean validate(Polygon.SimplePolygon[] polygons) {
@@ -296,28 +289,27 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
 
     /**
      * Checks the validness of the polyline. A polyline is invalid if it crosses the Date line
-     * @param polylines
-     * @return True iff the polyline is valid
+     *
+     * @param polylines The polyline to check
+     * @return True if the polyline is valid
      */
     private boolean validate(Polyline[] polylines) {
-        boolean outOfBounds = Arrays.stream(polylines).map(Polyline::getPoints).flatMap(Stream::of).anyMatch(p -> p.getCoordinate()[0] > 180 || p.getCoordinate()[0] < -180);
-        if (outOfBounds) {
-            //Polygon wraps around the Date line
-            return false;
-        }
-        return true;
+        //Polygon wraps around the Date line
+        return Arrays.stream(polylines)
+                .map(Polyline::getPoints).flatMap(Stream::of)
+                .noneMatch(p -> p.getCoordinate()[0] > 180 || p.getCoordinate()[0] < -180);
     }
 
     /**
-     * @param polygons
-     * @param first
+     * @param polygons The polygons to check
+     * @param first True if the polygons are the first set of polygons
      * @return The monotone chains that make up the polygons
      */
     private Pair<List<MonotoneChain>, List<LineSegment>> getMonotoneChains(Polygon.SimplePolygon[] polygons, boolean first) {
         List<MonotoneChain> result = new ArrayList<>();
         WGS84MonotoneChainPartitioner partitioner = new WGS84MonotoneChainPartitioner();
-        for (int i = 0; i < polygons.length; i++) {
-            List<MonotoneChain> partitioned = partitioner.partition(polygons[i]);
+        for (Polygon.SimplePolygon polygon : polygons) {
+            List<MonotoneChain> partitioned = partitioner.partition(polygon);
             result.addAll(partitioned);
         }
 
@@ -329,8 +321,8 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
     }
 
     /**
-     * @param polylines
-     * @param first
+     * @param polylines The polylines to check
+     * @param first True if the polylines are the first set of polylines
      * @return The monotone chains that make up the polyline
      */
     private Pair<List<MonotoneChain>, List<LineSegment>> getMonotoneChains(Polyline[] polylines, boolean first) {
@@ -349,8 +341,8 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
     }
 
     /**
-     * @param polygon
-     * @return List of all the shells and holes of the input polygon as simple polygons
+     * @param polygon The polygon to check
+     * @return Array of all the shells and holes of the input polygon as simple polygons
      */
     private Polygon.SimplePolygon[] getSimplePolygons(Polygon polygon) {
         Polygon.SimplePolygon[] aPolygons = Stream.concat(Arrays.stream(polygon.getShells()), Arrays.stream(polygon.getHoles()))
@@ -366,7 +358,7 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
      * Park S.C., Shin H., Choi B.K. (2001) A sweep line algorithm for polygonal chain intersection and its applications.
      * In: Kimura F. (eds) Geometric Modelling. GEO 1998. IFIP — The International Federation for Information Processing, vol 75. Springer, Boston, MA
      *
-     * @param inputList
+     * @param inputList The list of monotone chains to check for intersections
      * @return An array of points at which the two input polygons distance
      */
     public Point[] intersect(List<MonotoneChain> inputList, boolean shortcut) {
@@ -375,48 +367,50 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
         }
 
         Vertex v;
-        MonotoneChain MCa;
+        MonotoneChain mcA;
         while (!this.activeChainList.isEmpty()) {
-            MCa = this.activeChainList.get(0);
-            v = MCa.getFrontVertex();
-            MCa.advance();
-            insertMonotoneChainInACL(MCa);
+            mcA = this.activeChainList.get(0);
+            v = mcA.getFrontVertex();
+            mcA.advance();
+            insertMonotoneChainInACL(mcA);
 
             switch (v.getType()) {
                 case LEFT_MOST:
-                    insertInSCL(MCa, v.getPoint().getCoordinate()[0]);
-                    findIntersection(MCa, getPrevious(this.sweepingChainList, MCa));
-                    findIntersection(MCa, getNext(this.sweepingChainList, MCa));
+                    insertInSCL(mcA, v.getPoint().getCoordinate()[0]);
+                    findIntersection(mcA, getPrevious(this.sweepingChainList, mcA));
+                    findIntersection(mcA, getNext(this.sweepingChainList, mcA));
                     break;
                 case INTERNAL:
-                    findIntersection(MCa, getPrevious(this.sweepingChainList, MCa));
-                    findIntersection(MCa, getNext(this.sweepingChainList, MCa));
+                    findIntersection(mcA, getPrevious(this.sweepingChainList, mcA));
+                    findIntersection(mcA, getNext(this.sweepingChainList, mcA));
                     break;
-                case RIGHT_MOST:
-                    MonotoneChain MCp = getPrevious(this.sweepingChainList, MCa);
-                    MonotoneChain MCn = getNext(this.sweepingChainList, MCa);
-                    this.sweepingChainList.remove(MCa);
-                    this.activeChainList.remove(MCa);
-                    findIntersection(MCp, MCn);
+                case RIGHT_MOST: {
+                    MonotoneChain previous = getPrevious(this.sweepingChainList, mcA);
+                    MonotoneChain next = getNext(this.sweepingChainList, mcA);
+                    this.sweepingChainList.remove(mcA);
+                    this.activeChainList.remove(mcA);
+                    findIntersection(previous, next);
                     break;
-                case INTERSECTION:
-                    MonotoneChain finalMCa = MCa;
-                    MonotoneChain MCb = v.getMonotoneChains().stream().filter(c -> !c.equals(finalMCa)).findFirst().get();
-                    MCb.advance();
-                    insertMonotoneChainInACL(MCb);
-                    swapAccordingToSCL(new ArrayList<>(Arrays.asList(MCa, MCb)), v.getPoint().getCoordinate()[0]);
-                    MonotoneChain previous = getPrevious(sweepingChainList, MCb);
-                    if (previous != null && MCa.equals(previous)) {
-                        findIntersection(MCa, getPrevious(sweepingChainList, MCa));
-                        findIntersection(MCb, getNext(sweepingChainList, MCb));
+                }
+                case INTERSECTION: {
+                    MonotoneChain finalMCa = mcA;
+                    MonotoneChain mcB = v.getMonotoneChains().stream().filter(c -> !c.equals(finalMCa)).findFirst().orElseThrow();
+                    mcB.advance();
+                    insertMonotoneChainInACL(mcB);
+                    swapAccordingToSCL(new ArrayList<>(Arrays.asList(mcA, mcB)), v.getPoint().getCoordinate()[0]);
+                    MonotoneChain previous = getPrevious(sweepingChainList, mcB);
+                    if (previous != null && mcA.equals(previous)) {
+                        findIntersection(mcA, getPrevious(sweepingChainList, mcA));
+                        findIntersection(mcB, getNext(sweepingChainList, mcB));
                     } else {
-                        findIntersection(MCb, getPrevious(sweepingChainList, MCb));
-                        findIntersection(MCa, getNext(sweepingChainList, MCa));
+                        findIntersection(mcB, getPrevious(sweepingChainList, mcB));
+                        findIntersection(mcA, getNext(sweepingChainList, mcA));
                     }
                     addToOutput(v.getPoint());
                     break;
+                }
             }
-            if (shortcut && outputList.size() > 0) {
+            if (shortcut && !outputList.isEmpty()) {
                 return outputList.toArray(new Point[0]);
             }
         }
@@ -427,8 +421,8 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
     /**
      * Check for intersections between the vertical line segments and the monotone chains
      *
-     * @param verticals
-     * @param chains
+     * @param verticals The vertical line segments
+     * @param chains The monotone chains
      */
     private void checkVerticals(List<LineSegment> verticals, List<MonotoneChain> chains) {
         List<LineSegment> segments = new ArrayList<>();
@@ -449,7 +443,7 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
     private void addToOutput(Point point) {
         boolean flag = false;
         for (Point intersection : this.outputList) {
-            if (AlgoUtil.equal(intersection.getCoordinate(), point.getCoordinate())) {
+            if (AlgoUtil.isEqual(intersection.getCoordinate(), point.getCoordinate())) {
                 flag = true;
                 break;
             }
@@ -463,7 +457,7 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
     /**
      * Removes all successive collinear points of the given polygon
      *
-     * @param polygon
+     * @param polygon The polygon to filter
      * @return New polygon without successive collinear points
      */
     private Polygon.SimplePolygon filterCollinear(Polygon.SimplePolygon polygon) {
@@ -518,8 +512,8 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
      * Find the intersection between two monotone chains (if it exists) and create a new INTERSECTION vertex
      * if the intersection point is not a shared point of the two chains.
      *
-     * @param a
-     * @param b
+     * @param a The first monotone chain
+     * @param b The second monotone chain
      */
     private void findIntersection(MonotoneChain a, MonotoneChain b) {
         if (a == null || b == null) {
@@ -533,7 +527,8 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
         if (sharedPoint != null) {
             //Check if point isn't already in the output and the two chains are from different polygons by comparing signs
             if (!outputList.contains(LineSegment.sharedPoint(aSegment, bSegment)) &&
-                    ((a.getId() - splitId ^ b.getId() - splitId) < 0)) {
+                    ((a.getId() - splitId ^ b.getId() - splitId) < 0))
+            {
                 addToOutput(sharedPoint);
             }
             return;
@@ -561,7 +556,7 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
      * sort them in the sweeping chain list based on their angle at the sweep line.
      *
      * @param toSort The list of chains which will be re-sorted in the sweeping chain list
-     * @param x      The x-coordinate of the sweep line
+     * @param x The x-coordinate of the sweep line
      */
     private void swapAccordingToSCL(List<MonotoneChain> toSort, double x) {
         toSort.sort((a, b) -> {
@@ -590,7 +585,7 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
      * If this y-value coincides with another chain in the list, sort them by their angle.
      *
      * @param chain The chain to be inserted.
-     * @param x     The x-coordinate of the sweep line
+     * @param x The x-coordinate of the sweep line
      */
     private void insertInSCL(MonotoneChain chain, double x) {
         this.sweepingChainList.add(chain);
@@ -598,7 +593,7 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
             double aY = a.getY(x);
             double bY = b.getY(x);
 
-            if (AlgoUtil.equal(aY, bY)) {
+            if (AlgoUtil.isEqual(aY, bY)) {
                 double angleA = a.getAngle(x);
                 double angleB = b.getAngle(x);
 
@@ -612,7 +607,7 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
     /**
      * Get the next monotone chain from the list based on the position of the input chain.
      *
-     * @param list  The list of monotone chains to search
+     * @param list The list of monotone chains to search
      * @param chain The input chain
      * @return The next chain in the list based on the input chain, and null if no next chain exists.
      */
@@ -629,7 +624,7 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
     /**
      * Get the previous monotone chain from the list based on the position of the input chain.
      *
-     * @param list  The list of monotone chains to search
+     * @param list The list of monotone chains to search
      * @param chain The input chain
      * @return The previous chain in the list based on the input chain, and null if no previous chain exists.
      */
@@ -644,8 +639,8 @@ public class WGS84MCSweepLineIntersect extends WGS84Intersect {
     }
 
     record Pair<T, U>(T first, U other) {
-      public static <T, U> Pair<T,U> of(T first, U other) {
-        return new Pair<>(first, other);
-      }
+        public static <T, U> Pair<T, U> of(T first, U other) {
+            return new Pair<>(first, other);
+        }
     }
 }

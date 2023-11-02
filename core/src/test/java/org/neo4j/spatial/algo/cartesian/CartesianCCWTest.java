@@ -13,10 +13,10 @@ public class CartesianCCWTest {
     @Test
     public void isCCW() {
         Polygon.SimplePolygon simple = Polygon.simple(
-                Point.point(CRS.Cartesian, -10, -10),
-                Point.point(CRS.Cartesian, 10, -10),
-                Point.point(CRS.Cartesian, 10, 10),
-                Point.point(CRS.Cartesian, -10, 10)
+                Point.point(CRS.CARTESIAN, -10, -10),
+                Point.point(CRS.CARTESIAN, 10, -10),
+                Point.point(CRS.CARTESIAN, 10, 10),
+                Point.point(CRS.CARTESIAN, -10, 10)
         );
 
         boolean actual = new CartesianCCW().isCCW(simple);
@@ -24,9 +24,9 @@ public class CartesianCCWTest {
         assertThat(actual, equalTo(expected));
 
         simple = Polygon.simple(
-                Point.point(CRS.Cartesian, -10, -10),
-                Point.point(CRS.Cartesian, 10, 10),
-                Point.point(CRS.Cartesian, -10, 10)
+                Point.point(CRS.CARTESIAN, -10, -10),
+                Point.point(CRS.CARTESIAN, 10, 10),
+                Point.point(CRS.CARTESIAN, -10, 10)
         );
 
         actual = new CartesianCCW().isCCW(simple);
@@ -34,10 +34,10 @@ public class CartesianCCWTest {
         assertThat(actual, equalTo(expected));
 
         simple = Polygon.simple(
-                Point.point(CRS.Cartesian, -10, -10),
-                Point.point(CRS.Cartesian, -10, 10),
-                Point.point(CRS.Cartesian, 10, 10),
-                Point.point(CRS.Cartesian, 10, -10)
+                Point.point(CRS.CARTESIAN, -10, -10),
+                Point.point(CRS.CARTESIAN, -10, 10),
+                Point.point(CRS.CARTESIAN, 10, 10),
+                Point.point(CRS.CARTESIAN, 10, -10)
         );
 
         actual = new CartesianCCW().isCCW(simple);

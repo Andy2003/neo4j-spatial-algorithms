@@ -7,8 +7,11 @@ import org.neo4j.spatial.core.Point;
 import org.neo4j.spatial.core.Polygon;
 
 public class WithinCalculator {
+    private WithinCalculator() {
+    }
+
     public static boolean within(Polygon polygon, Point point) {
-        if (polygon.getCRS() == CRS.Cartesian) {
+        if (polygon.getCRS() == CRS.CARTESIAN) {
             return CartesianWithin.within(polygon, point);
         } else {
             return WGS84Within.within(polygon, point);
@@ -16,7 +19,7 @@ public class WithinCalculator {
     }
 
     public static boolean within(Polygon.SimplePolygon polygon, Point point) {
-        if (polygon.getCRS() == CRS.Cartesian) {
+        if (polygon.getCRS() == CRS.CARTESIAN) {
             return CartesianWithin.within(polygon, point);
         } else {
             return WGS84Within.within(polygon, point);

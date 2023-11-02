@@ -31,7 +31,7 @@ public class PolygonTest {
         double[][] coordinates = getPoints(n);
         Point[] points = new Point[n];
         for (int i = 0; i < n; i++) {
-            points[i] = Point.point(CRS.Cartesian, coordinates[i]);
+            points[i] = Point.point(CRS.CARTESIAN, coordinates[i]);
         }
 
         Polygon.SimplePolygon simplePolygon = Polygon.simple(points);
@@ -44,7 +44,7 @@ public class PolygonTest {
         }
         Assert.assertThat(polygonPoints.length, equalTo(n+1)); //n+1 iterations
 
-        simplePolygon.startTraversal(Point.point(CRS.Cartesian, 5, 0), Point.point(CRS.Cartesian, 5, 2));
+        simplePolygon.startTraversal(Point.point(CRS.CARTESIAN, 5, 0), Point.point(CRS.CARTESIAN, 5, 2));
         idx = 0;
         while (!simplePolygon.fullyTraversed()) {
             Point point = simplePolygon.getNextPoint();
@@ -55,7 +55,7 @@ public class PolygonTest {
         Assert.assertThat(idx, equalTo(n+1)); //n+1 iterations
 
 
-        simplePolygon.startTraversal(Point.point(CRS.Cartesian, 5, 0), Point.point(CRS.Cartesian, 0, 0));
+        simplePolygon.startTraversal(Point.point(CRS.CARTESIAN, 5, 0), Point.point(CRS.CARTESIAN, 0, 0));
         idx = n;
         while (!simplePolygon.fullyTraversed()) {
             Point point = simplePolygon.getNextPoint();
@@ -66,7 +66,7 @@ public class PolygonTest {
         Assert.assertThat(idx, equalTo(-1)); //n+1 iterations
 
 
-        simplePolygon.startTraversal(Point.point(CRS.Cartesian, 0, 8), Point.point(CRS.Cartesian, 5, 8));
+        simplePolygon.startTraversal(Point.point(CRS.CARTESIAN, 0, 8), Point.point(CRS.CARTESIAN, 5, 8));
         idx = 5;
         while (!simplePolygon.fullyTraversed()) {
             Point point = simplePolygon.getNextPoint();
@@ -80,10 +80,10 @@ public class PolygonTest {
     private static Polygon.SimplePolygon makeSquareWithStart(int offset) {
         Point[] points = new Point[4];
         Point[] base = new Point[]{
-                Point.point(CRS.Cartesian, -10,-10),
-                Point.point(CRS.Cartesian, 10,-10),
-                Point.point(CRS.Cartesian, 10,10),
-                Point.point(CRS.Cartesian, -10,10)
+                Point.point(CRS.CARTESIAN, -10,-10),
+                Point.point(CRS.CARTESIAN, 10,-10),
+                Point.point(CRS.CARTESIAN, 10,10),
+                Point.point(CRS.CARTESIAN, -10,10)
         };
 
         for (int i = 0; i < points.length; i++) {

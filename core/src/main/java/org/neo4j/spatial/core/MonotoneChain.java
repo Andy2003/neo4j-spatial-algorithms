@@ -1,9 +1,6 @@
 package org.neo4j.spatial.core;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class MonotoneChain {
@@ -157,6 +154,11 @@ public class MonotoneChain {
 
     @Override
     public boolean equals(Object other) {
-        return other instanceof MonotoneChain && this.equals((MonotoneChain) other);
+        return other instanceof MonotoneChain monotoneChain && this.equals(monotoneChain);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

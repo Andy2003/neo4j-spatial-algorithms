@@ -17,21 +17,21 @@ public class CartesianWGS84MonotoneChainPartitionerTest {
 
     private Polygon.SimplePolygon makeTestPolygon() {
         return Polygon.simple(
-                Point.point(CRS.Cartesian, -18,-12),
-                Point.point(CRS.Cartesian, -3,-3),
-                Point.point(CRS.Cartesian, 10,-15),
-                Point.point(CRS.Cartesian, 18,3),
-                Point.point(CRS.Cartesian, -2,14),
-                Point.point(CRS.Cartesian, -11,8),
-                Point.point(CRS.Cartesian, -0,1),
-                Point.point(CRS.Cartesian, -17,2),
-                Point.point(CRS.Cartesian, -21,12),
-                Point.point(CRS.Cartesian, -25,4),
-                Point.point(CRS.Cartesian, -29,-3),
-                Point.point(CRS.Cartesian, -22,-9),
-                Point.point(CRS.Cartesian, -17,-6),
-                Point.point(CRS.Cartesian, -27,-14),
-                Point.point(CRS.Cartesian, -18,-12)
+                Point.point(CRS.CARTESIAN, -18,-12),
+                Point.point(CRS.CARTESIAN, -3,-3),
+                Point.point(CRS.CARTESIAN, 10,-15),
+                Point.point(CRS.CARTESIAN, 18,3),
+                Point.point(CRS.CARTESIAN, -2,14),
+                Point.point(CRS.CARTESIAN, -11,8),
+                Point.point(CRS.CARTESIAN, -0,1),
+                Point.point(CRS.CARTESIAN, -17,2),
+                Point.point(CRS.CARTESIAN, -21,12),
+                Point.point(CRS.CARTESIAN, -25,4),
+                Point.point(CRS.CARTESIAN, -29,-3),
+                Point.point(CRS.CARTESIAN, -22,-9),
+                Point.point(CRS.CARTESIAN, -17,-6),
+                Point.point(CRS.CARTESIAN, -27,-14),
+                Point.point(CRS.CARTESIAN, -18,-12)
         );
     }
 }

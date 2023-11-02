@@ -15,6 +15,7 @@ import org.neo4j.internal.helpers.collection.Iterables;
 import org.neo4j.kernel.api.procedure.GlobalProcedures;
 import org.neo4j.kernel.impl.traversal.MonoDirectionalTraversalDescription;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
+import org.neo4j.spatial.core.Polygon;
 import org.neo4j.test.TestDatabaseManagementServiceBuilder;
 import org.neo4j.values.storable.CoordinateReferenceSystem;
 import org.neo4j.values.storable.Values;
@@ -66,7 +67,7 @@ public class UserDefinedFunctionsTest {
     public void shouldCreateOSMGraphPolygonOneDirectionOverlap() {
         try (Transaction tx = db.beginTx()) {
             Node main = tx.createNode(Label.label("OSMRelation"));
-            main.setProperty("relation_osm_id", 1L);
+            main.setProperty(Polygon.RELATION_OSM_ID, 1L);
 
             int x = 4;
             int y = 3;
@@ -89,7 +90,7 @@ public class UserDefinedFunctionsTest {
                         ways[i].createRelationshipTo(wayNodes[i][j], Relation.FIRST_NODE);
                     } else {
                         rel = wayNodes[i][j - 1].createRelationshipTo(wayNodes[i][j], Relation.NEXT);
-                        rel.setProperty("relation_osm_id", 1L);
+                        rel.setProperty(Polygon.RELATION_OSM_ID, 1L);
                     }
                 }
 
@@ -106,19 +107,19 @@ public class UserDefinedFunctionsTest {
             }
 
             rel = wayNodes[0][y - 1].createRelationshipTo(connectors[0], Relation.NEXT);
-            rel.setProperty("relation_osm_id", 1L);
+            rel.setProperty(Polygon.RELATION_OSM_ID, 1L);
             connectors[0].createRelationshipTo(nodes[1][0], Relation.NODE);
 
             rel = wayNodes[1][y - 1].createRelationshipTo(connectors[1], Relation.NEXT);
-            rel.setProperty("relation_osm_id", 1L);
+            rel.setProperty(Polygon.RELATION_OSM_ID, 1L);
             connectors[1].createRelationshipTo(nodes[2][0], Relation.NODE);
 
             rel = wayNodes[2][y - 1].createRelationshipTo(connectors[2], Relation.NEXT);
-            rel.setProperty("relation_osm_id", 1L);
+            rel.setProperty(Polygon.RELATION_OSM_ID, 1L);
             connectors[2].createRelationshipTo(nodes[3][0], Relation.NODE);
 
             rel = wayNodes[3][y - 1].createRelationshipTo(connectors[3], Relation.NEXT);
-            rel.setProperty("relation_osm_id", 1L);
+            rel.setProperty(Polygon.RELATION_OSM_ID, 1L);
             connectors[3].createRelationshipTo(nodes[0][0], Relation.NODE);
 
             tx.execute("CALL spatial.osm.graph.createPolygon($main)", map("main", main));
@@ -134,7 +135,7 @@ public class UserDefinedFunctionsTest {
     public void shouldCreateOSMGraphPolygonRandomDirectionOverlap() {
         try (Transaction tx = db.beginTx()) {
             Node main = tx.createNode(Label.label("OSMRelation"));
-            main.setProperty("relation_osm_id", 1l);
+            main.setProperty(Polygon.RELATION_OSM_ID, 1l);
 
             int x = 4;
             int y = 3;
@@ -155,7 +156,7 @@ public class UserDefinedFunctionsTest {
 
                     if (j > 0) {
                         rel = wayNodes[i][j - 1].createRelationshipTo(wayNodes[i][j], Relation.NEXT);
-                        rel.setProperty("relation_osm_id", 1l);
+                        rel.setProperty(Polygon.RELATION_OSM_ID, 1l);
                     }
                 }
 
@@ -173,22 +174,22 @@ public class UserDefinedFunctionsTest {
 
             ways[0].createRelationshipTo(wayNodes[0][0], Relation.FIRST_NODE);
             rel = wayNodes[0][y - 1].createRelationshipTo(connectors[0], Relation.NEXT);
-            rel.setProperty("relation_osm_id", 1l);
+            rel.setProperty(Polygon.RELATION_OSM_ID, 1l);
             connectors[0].createRelationshipTo(nodes[1][y - 1], Relation.NODE);
 
             ways[1].createRelationshipTo(connectors[1], Relation.FIRST_NODE);
             rel = connectors[1].createRelationshipTo(wayNodes[1][0], Relation.NEXT);
-            rel.setProperty("relation_osm_id", 1l);
+            rel.setProperty(Polygon.RELATION_OSM_ID, 1l);
             connectors[1].createRelationshipTo(nodes[2][0], Relation.NODE);
 
             ways[2].createRelationshipTo(wayNodes[2][0], Relation.FIRST_NODE);
             rel = wayNodes[2][y - 1].createRelationshipTo(connectors[2], Relation.NEXT);
-            rel.setProperty("relation_osm_id", 1l);
+            rel.setProperty(Polygon.RELATION_OSM_ID, 1l);
             connectors[2].createRelationshipTo(nodes[3][y - 1], Relation.NODE);
 
             ways[3].createRelationshipTo(connectors[3], Relation.FIRST_NODE);
             rel = connectors[3].createRelationshipTo(wayNodes[3][0], Relation.NEXT);
-            rel.setProperty("relation_osm_id", 1l);
+            rel.setProperty(Polygon.RELATION_OSM_ID, 1l);
             connectors[3].createRelationshipTo(nodes[0][0], Relation.NODE);
 
             tx.execute("CALL spatial.osm.graph.createPolygon($main)", map("main", main));
@@ -204,7 +205,7 @@ public class UserDefinedFunctionsTest {
     public void shouldCreateOSMGraphPolygonOneDirectionNoOverlap() {
         try (Transaction tx = db.beginTx()) {
             Node main = tx.createNode(Label.label("OSMRelation"));
-            main.setProperty("relation_osm_id", 1l);
+            main.setProperty(Polygon.RELATION_OSM_ID, 1l);
 
             int x = 4;
             int y = 3;
@@ -227,7 +228,7 @@ public class UserDefinedFunctionsTest {
                         ways[i].createRelationshipTo(wayNodes[i][j], Relation.FIRST_NODE);
                     } else {
                         rel = wayNodes[i][j - 1].createRelationshipTo(wayNodes[i][j], Relation.NEXT);
-                        rel.setProperty("relation_osm_id", 1l);
+                        rel.setProperty(Polygon.RELATION_OSM_ID, 1l);
                     }
                 }
 
@@ -252,25 +253,25 @@ public class UserDefinedFunctionsTest {
             Node[] connectorNodes = new Node[x];
 
             rel = wayNodes[0][y - 1].createRelationshipTo(connectors[0], Relation.NEXT);
-            rel.setProperty("relation_osm_id", 1l);
+            rel.setProperty(Polygon.RELATION_OSM_ID, 1l);
             connectorNodes[0] = tx.createNode(Label.label("OSMNode"));
             connectorNodes[0].setProperty("location", Values.pointValue(CoordinateReferenceSystem.WGS_84, 1 * 1e-3, 2.5 * 1e-3));
             connectors[0].createRelationshipTo(connectorNodes[0], Relation.NODE);
 
             rel = wayNodes[1][y - 1].createRelationshipTo(connectors[1], Relation.NEXT);
-            rel.setProperty("relation_osm_id", 1l);
+            rel.setProperty(Polygon.RELATION_OSM_ID, 1l);
             connectorNodes[1] = tx.createNode(Label.label("OSMNode"));
             connectorNodes[1].setProperty("location", Values.pointValue(CoordinateReferenceSystem.WGS_84, 0.5 * 1e-3, 5 * 1e-3));
             connectors[1].createRelationshipTo(connectorNodes[1], Relation.NODE);
 
             rel = wayNodes[2][y - 1].createRelationshipTo(connectors[2], Relation.NEXT);
-            rel.setProperty("relation_osm_id", 1l);
+            rel.setProperty(Polygon.RELATION_OSM_ID, 1l);
             connectorNodes[2] = tx.createNode(Label.label("OSMNode"));
             connectorNodes[2].setProperty("location", Values.pointValue(CoordinateReferenceSystem.WGS_84, 0, 2.5 * 1e-3));
             connectors[2].createRelationshipTo(connectorNodes[2], Relation.NODE);
 
             rel = wayNodes[3][y - 1].createRelationshipTo(connectors[3], Relation.NEXT);
-            rel.setProperty("relation_osm_id", 1l);
+            rel.setProperty(Polygon.RELATION_OSM_ID, 1l);
             connectorNodes[3] = tx.createNode(Label.label("OSMNode"));
             connectorNodes[3].setProperty("location", Values.pointValue(CoordinateReferenceSystem.WGS_84, 0.5 * 1e-3, 0));
             connectors[3].createRelationshipTo(connectorNodes[3], Relation.NODE);
@@ -289,7 +290,7 @@ public class UserDefinedFunctionsTest {
         String mainId;
         try (Transaction tx = db.beginTx()) {
             Node main = tx.createNode(Label.label("OSMRelation"));
-            main.setProperty("relation_osm_id", 1L);
+            main.setProperty(Polygon.RELATION_OSM_ID, 1L);
             mainId = main.getElementId();
 
             int x = 4;
@@ -313,7 +314,7 @@ public class UserDefinedFunctionsTest {
                         ways[i].createRelationshipTo(wayNodes[i][j], Relation.FIRST_NODE);
                     } else {
                         rel = wayNodes[i][j - 1].createRelationshipTo(wayNodes[i][j], Relation.NEXT);
-                        rel.setProperty("relation_osm_id", 1l);
+                        rel.setProperty(Polygon.RELATION_OSM_ID, 1l);
                     }
                 }
 
@@ -329,15 +330,15 @@ public class UserDefinedFunctionsTest {
             }
 
             rel = wayNodes[0][y - 1].createRelationshipTo(connectors[0], Relation.NEXT);
-            rel.setProperty("relation_osm_id", 1l);
+            rel.setProperty(Polygon.RELATION_OSM_ID, 1l);
             connectors[0].createRelationshipTo(nodes[1][0], Relation.NODE);
 
             rel = wayNodes[1][y - 1].createRelationshipTo(connectors[1], Relation.NEXT);
-            rel.setProperty("relation_osm_id", 1l);
+            rel.setProperty(Polygon.RELATION_OSM_ID, 1l);
             connectors[1].createRelationshipTo(nodes[2][0], Relation.NODE);
 
             rel = wayNodes[2][y - 1].createRelationshipTo(connectors[2], Relation.NEXT);
-            rel.setProperty("relation_osm_id", 1l);
+            rel.setProperty(Polygon.RELATION_OSM_ID, 1l);
             connectors[2].createRelationshipTo(nodes[3][0], Relation.NODE);
 
             tx.commit();
@@ -371,7 +372,7 @@ public class UserDefinedFunctionsTest {
         String firstWayId;
         try (Transaction tx = db.beginTx()) {
             Node main = tx.createNode(Label.label("OSMRelation"));
-            main.setProperty("relation_osm_id", 1L);
+            main.setProperty(Polygon.RELATION_OSM_ID, 1L);
             mainId = main.getElementId();
 
             firstWayId = createNestedSquareOSM(tx, main);

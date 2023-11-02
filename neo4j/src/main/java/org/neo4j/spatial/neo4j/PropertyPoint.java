@@ -18,18 +18,25 @@ public class PropertyPoint implements Point{
         this.coordinate = new double[]{x, y};
     }
 
+    @Override
     public boolean equals(Point other) {
         return Arrays.equals(this.getCoordinate(), other.getCoordinate());
     }
 
+    @Override
     public boolean equals(Object other) {
-        return other instanceof Point && this.equals((Point) other);
+        return other instanceof Point point && this.equals(point);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(coordinate);
     }
 
     @Override
     public CRS getCRS() {
         //TODO support different CRS
-        return CRS.Cartesian;
+        return CRS.CARTESIAN;
     }
 
     @Override

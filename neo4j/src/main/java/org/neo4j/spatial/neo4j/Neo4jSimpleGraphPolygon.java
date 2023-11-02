@@ -1,6 +1,12 @@
 package org.neo4j.spatial.neo4j;
 
-import org.neo4j.graphdb.*;
+import java.util.Iterator;
+import java.util.Objects;
+
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Path;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Evaluator;
 import org.neo4j.graphdb.traversal.Traverser;
@@ -14,17 +20,15 @@ import org.neo4j.spatial.core.CRS;
 import org.neo4j.spatial.core.Point;
 import org.neo4j.spatial.core.Polygon;
 
-import java.util.*;
-
 import static java.lang.String.format;
 
 public abstract class Neo4jSimpleGraphPolygon implements Polygon.SimplePolygon {
-    final private long osmRelationId;
-    final private CRS crs;
+    private final long osmRelationId;
+    private final CRS crs;
     private Iterator<Node> nodeIterator;
     Node firstWayNode;
 
-    public Neo4jSimpleGraphPolygon(Node firstWayNode, long osmRelationId) {
+    protected Neo4jSimpleGraphPolygon(Node firstWayNode, long osmRelationId) {
         this.osmRelationId = osmRelationId;
         this.firstWayNode = firstWayNode;
         crs = extractPoint(firstWayNode).getCRS();
@@ -167,13 +171,13 @@ public abstract class Neo4jSimpleGraphPolygon implements Polygon.SimplePolygon {
     }
 
     private static class WayEvaluator implements Evaluator {
-        private long relationId;
-        private Direction nextDirection;
-        private Direction nextInPolygonDirection;
+        private final long relationId;
+        private final Direction nextDirection;
+        private final Direction nextInPolygonDirection;
         private boolean firstWay;
 
-        private long firstLocationNode = -1;
-        private long previousLocationNode = -1;
+        private String firstLocationNode = null;
+        private String previousLocationNode = null;
         private boolean finished;
         private Direction lastNextDirection;
 
@@ -193,17 +197,17 @@ public abstract class Neo4jSimpleGraphPolygon implements Polygon.SimplePolygon {
 
             Relationship rel = path.lastRelationship();
             Node endNode = path.endNode();
-            long locationNode = getLocationNode(endNode);
+            String locationNode = getLocationNode(endNode);
 
-            if (path.length() == 1) {
-                if (rel.isType(Relation.NEXT) && nextInPolygonDirection != null) {
-                    return Evaluation.EXCLUDE_AND_PRUNE;
-                } else if (rel.isType(Relation.NEXT_IN_POLYGON) && nextDirection != null) {
-                    return Evaluation.EXCLUDE_AND_PRUNE;
-                }
+            if (path.length() == 1
+                    && (rel.isType(Relation.NEXT) && nextInPolygonDirection != null
+                    || rel.isType(Relation.NEXT_IN_POLYGON) && nextDirection != null))
+            {
+                return Evaluation.EXCLUDE_AND_PRUNE;
+
             }
 
-            if (locationNode == previousLocationNode) {
+            if (Objects.equals(locationNode, previousLocationNode)) {
                 if (rel.isType(Relation.NEXT_IN_POLYGON)) {
                     if (!nextInPolygon(rel) || !validDirection(rel, endNode, nextInPolygonDirection)) {
                         return Evaluation.EXCLUDE_AND_PRUNE;
@@ -214,7 +218,7 @@ public abstract class Neo4jSimpleGraphPolygon implements Polygon.SimplePolygon {
                 return Evaluation.EXCLUDE_AND_CONTINUE;
             }
 
-            if (firstLocationNode == locationNode) {
+            if (Objects.equals(firstLocationNode, locationNode)) {
                 finished = true;
                 return Evaluation.INCLUDE_AND_PRUNE;
             }
@@ -252,19 +256,14 @@ public abstract class Neo4jSimpleGraphPolygon implements Polygon.SimplePolygon {
             return Evaluation.EXCLUDE_AND_PRUNE;
         }
 
-        private long getLocationNode(Node node) {
-            return node.getSingleRelationship(Relation.NODE, Direction.OUTGOING).getEndNodeId();
+        private String getLocationNode(Node node) {
+            return node.getSingleRelationship(Relation.NODE, Direction.OUTGOING).getEndNode().getElementId();
         }
 
         private boolean validDirection(Relationship rel, Node endNode, Direction direction) {
-            if (direction != null) {
-                if (direction == Direction.OUTGOING && endNode.equals(rel.getStartNode())) {
-                    return false;
-                } else if (direction == Direction.INCOMING && endNode.equals(rel.getEndNode())) {
-                    return false;
-                }
-            }
-            return true;
+            return direction == null
+                    || !(direction == Direction.OUTGOING && endNode.equals(rel.getStartNode()))
+                    && !(direction == Direction.INCOMING && endNode.equals(rel.getEndNode()));
         }
 
         private boolean nextInPolygon(Relationship rel) {
@@ -272,10 +271,9 @@ public abstract class Neo4jSimpleGraphPolygon implements Polygon.SimplePolygon {
         }
 
         static boolean nextInPolygon(Relationship rel, long relationId) {
-            long[] ids = (long[]) rel.getProperty("relation_osm_ids");
-
-            for (int i = 0; i < ids.length; i++) {
-                if (ids[i] == relationId) {
+            long[] ids = (long[]) rel.getProperty(Polygon.RELATION_OSM_IDS);
+            for (long id : ids) {
+                if (id == relationId) {
                     return true;
                 }
             }
@@ -283,7 +281,7 @@ public abstract class Neo4jSimpleGraphPolygon implements Polygon.SimplePolygon {
         }
     }
 
-    private class TraversalException extends RuntimeException {
+    private static class TraversalException extends RuntimeException {
         public TraversalException(String message) {
         }
     }

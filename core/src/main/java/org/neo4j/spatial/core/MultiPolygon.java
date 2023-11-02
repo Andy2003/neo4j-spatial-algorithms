@@ -158,7 +158,7 @@ public class MultiPolygon implements Polygon {
                 }
             }
 
-            if (containedInOther.size() > 0) {
+            if (!containedInOther.isEmpty()) {
                 for (MultiPolygonNode child : containedInOther) {
                     other.addChild(child);
                     this.removeChild(child);
@@ -242,7 +242,7 @@ public class MultiPolygon implements Polygon {
                 StringJoiner holes = new StringJoiner(",", "", ")");
                 String shell = "(" + this.polygon.toWKTPointString(false);
 
-                if (this.getChildren().size() > 0) {
+                if (!this.getChildren().isEmpty()) {
                     for (MultiPolygonNode child : this.getChildren()) {
                         holes.add(child.getPolygon().toWKTPointString(true));
                     }

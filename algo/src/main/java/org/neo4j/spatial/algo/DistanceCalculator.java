@@ -8,6 +8,9 @@ public class DistanceCalculator {
     private static CartesianDistance cartesian;
     private static WGS84Distance wgs84;
 
+    private DistanceCalculator() {
+    }
+
     private static Distance getCartesian() {
         if (cartesian == null) {
             cartesian = new CartesianDistance();
@@ -23,7 +26,7 @@ public class DistanceCalculator {
     }
 
     public static Distance getCalculator(CRS crs) {
-        if (crs == CRS.Cartesian) {
+        if (crs == CRS.CARTESIAN) {
             return getCartesian();
         } else if (crs == CRS.WGS84) {
             return getWGS84();

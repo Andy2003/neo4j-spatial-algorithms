@@ -1,6 +1,5 @@
 package org.neo4j.spatial.benchmarks.macro;
 
-import org.neo4j.configuration.GraphDatabaseSettings;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -40,7 +39,7 @@ public class LinearReferenceMacroBenchmarks {
     private DatabaseManagementService databases;
     private GraphDatabaseService db;
     private Distance geographicDistanceCalc= DistanceCalculator.getCalculator(CRS.WGS84);
-    private Distance cartesianDistanceCalc = DistanceCalculator.getCalculator(CRS.Cartesian);
+    private Distance cartesianDistanceCalc = DistanceCalculator.getCalculator(CRS.CARTESIAN);
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
@@ -94,7 +93,7 @@ public class LinearReferenceMacroBenchmarks {
 
         try (Transaction tx = db.beginTx()) {
             for (int i = 0; i < ids.length; i++) {
-                nodes[i] = tx.findNode(label, "relation_osm_id", ids[i]);
+                nodes[i] = tx.findNode(label, Polygon.RELATION_OSM_ID, ids[i]);
 
                 geographicDist = 0;
                 cartesianDist = 0;
@@ -134,7 +133,7 @@ public class LinearReferenceMacroBenchmarks {
             for (int i = 0; i < nodes.length; i++) {
                 Polygon.SimplePolygon polygon = UserDefinedFunctions.getGraphNodePolygon(nodes[i]).getChildren().get(0).getPolygon();
 
-                bh.consume(LinearReferenceCalculator.getCalculator(CRS.Cartesian).reference(polygon, start[i], direction[i], cartesianDistance[i]));
+                bh.consume(LinearReferenceCalculator.getCalculator(CRS.CARTESIAN).reference(polygon, start[i], direction[i], cartesianDistance[i]));
             }
             tx.commit();
         }
@@ -159,7 +158,7 @@ public class LinearReferenceMacroBenchmarks {
                 for (int i = 0; i < nodes.length; i++) {
                     Polygon.SimplePolygon polygon = UserDefinedFunctions.getArrayPolygon(nodes[i]).getChildren().get(0).getPolygon();
 
-                    bh.consume(LinearReferenceCalculator.getCalculator(CRS.Cartesian).reference(polygon, start[i], direction[i], cartesianDistance[i]));
+                    bh.consume(LinearReferenceCalculator.getCalculator(CRS.CARTESIAN).reference(polygon, start[i], direction[i], cartesianDistance[i]));
                 }
                 tx.commit();
             }

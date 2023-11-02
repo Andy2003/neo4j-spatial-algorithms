@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CartesianMonotoneChainPartitioner {
+
+    private CartesianMonotoneChainPartitioner() {
+    }
+
     /**
      * Partition the polygon in x-monotone chains.
      *
@@ -74,7 +78,7 @@ public class CartesianMonotoneChainPartitioner {
     /**
      * Partition the polyline in x-monotone chains.
      *
-     * @param polyline
+     * @param polyline The polyline to partition
      * @return List of x-monotone chains which together create the input polyline
      */
     public static List<MonotoneChain> partition(Polyline polyline) {
@@ -108,6 +112,7 @@ public class CartesianMonotoneChainPartitioner {
 
     private static double getXDirection(LineSegment lineSegment) {
         double dx = LineSegment.dX(lineSegment);
-        return dx == 0 ? 0.0 : dx > 0 ? 1.0 : -1.0;
+        if (dx == 0) return 0.0;
+        return dx > 0 ? 1.0 : -1.0;
     }
 }

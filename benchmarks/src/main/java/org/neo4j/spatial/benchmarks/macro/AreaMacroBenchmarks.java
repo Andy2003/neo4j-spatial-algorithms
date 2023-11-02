@@ -1,6 +1,5 @@
 package org.neo4j.spatial.benchmarks.macro;
 
-import org.neo4j.configuration.GraphDatabaseSettings;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -11,6 +10,7 @@ import org.neo4j.spatial.algo.cartesian.CartesianArea;
 import org.neo4j.spatial.algo.wgs84.WGS84Area;
 import org.neo4j.spatial.benchmarks.JfrProfiler;
 import org.neo4j.spatial.core.MultiPolygon;
+import org.neo4j.spatial.core.Polygon;
 import org.neo4j.spatial.neo4j.UserDefinedFunctions;
 import org.neo4j.test.TestDatabaseManagementServiceBuilder;
 import org.openjdk.jmh.annotations.*;
@@ -32,8 +32,8 @@ public class AreaMacroBenchmarks {
     private Node[] nodes;
     private DatabaseManagementService databases;
     private GraphDatabaseService db;
-    private Area cartesianCalculator = new CartesianArea();
-    private Area WGS84Calculator = new WGS84Area();
+    private final Area cartesianCalculator = new CartesianArea();
+    private final Area wgs84Calculator = new WGS84Area();
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
@@ -79,7 +79,7 @@ public class AreaMacroBenchmarks {
 
         try (Transaction tx = db.beginTx()) {
             for (int i = 0; i < ids.length; i++) {
-                nodes[i] = tx.findNode(label, "relation_osm_id", ids[i]);
+                nodes[i] = tx.findNode(label, Polygon.RELATION_OSM_ID, ids[i]);
 
                 if (nodes[i] == null) {
                     throw new IllegalStateException("OSMRelation not found for relation: " + ids[i]);
@@ -113,7 +113,7 @@ public class AreaMacroBenchmarks {
             for (Node osmRelation : nodes) {
                 MultiPolygon polygon = UserDefinedFunctions.getGraphNodePolygon(osmRelation);
 
-                bh.consume(WGS84Calculator.area(polygon));
+                bh.consume(wgs84Calculator.area(polygon));
             }
             tx.commit();
         }
@@ -142,7 +142,7 @@ public class AreaMacroBenchmarks {
             for (Node osmRelation : nodes) {
                 MultiPolygon polygon = UserDefinedFunctions.getArrayPolygon(osmRelation);
 
-                bh.consume(WGS84Calculator.area(polygon));
+                bh.consume(wgs84Calculator.area(polygon));
             }
             tx.commit();
         }

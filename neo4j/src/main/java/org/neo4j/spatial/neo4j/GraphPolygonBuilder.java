@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 public class GraphPolygonBuilder extends GraphBuilder {
-    private static Label POLYGON_LABEL = Label.label("Polygon");
-    private static Label SHELL_LABEL = Label.label("Shell");
-    private static Label HOLE_LABEL = Label.label("Hole");
+    private static final Label POLYGON_LABEL = Label.label("Polygon");
+    private static final Label SHELL_LABEL = Label.label("Shell");
+    private static final Label HOLE_LABEL = Label.label("Hole");
 
     public GraphPolygonBuilder(Transaction tx, Node main, List<List<Node>> polylines) {
         super(tx, main, polylines);
@@ -33,7 +33,7 @@ public class GraphPolygonBuilder extends GraphBuilder {
      */
     private MultiPolygon buildMultiPolygon() {
 
-        long relationOsmId = (long) main.getProperty("relation_osm_id");
+        long relationOsmId = (long) main.getProperty(Polygon.RELATION_OSM_ID);
         MultiPolygon root = new MultiPolygon();
 
         Polygon.SimplePolygon[] polygons = new Polygon.SimplePolygon[polylines.size()];

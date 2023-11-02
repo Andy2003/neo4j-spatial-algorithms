@@ -5,6 +5,8 @@ import java.util.Arrays;
 import static java.lang.String.format;
 
 public interface Point extends HasCRS {
+    String PROPERTY = "location";
+
     static Point point(CRS crs, double... coordinate) {
         return new InMemoryPoint(crs, coordinate);
     }
@@ -101,7 +103,7 @@ class InMemoryPoint implements Point {
 
     @Override
     public boolean equals(Object other) {
-        return other instanceof Point && this.equals((Point) other);
+        return other instanceof Point point && this.equals((point));
     }
 
     @Override

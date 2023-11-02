@@ -8,7 +8,7 @@ import org.neo4j.spatial.core.Point;
 public class CartesianLinearReference extends LinearReference {
     @Override
     protected CRS getCRS() {
-        return CRS.Cartesian;
+        return CRS.CARTESIAN;
     }
 
     public Point reference(LineSegment lineSegment, double d) {
@@ -31,6 +31,6 @@ public class CartesianLinearReference extends LinearReference {
 
         double fraction = d / length;
 
-        return Point.point(CRS.Cartesian, p[0] + fraction * (q[0] - p[0]), p[1] + fraction * (q[1] - p[1]));
+        return Point.point(CRS.CARTESIAN, p[0] + fraction * (q[0] - p[0]), p[1] + fraction * (q[1] - p[1]));
     }
 }

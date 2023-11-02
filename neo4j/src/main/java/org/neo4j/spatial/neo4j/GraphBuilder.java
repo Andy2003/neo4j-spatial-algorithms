@@ -2,6 +2,7 @@ package org.neo4j.spatial.neo4j;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.neo4j.graphdb.*;
+import org.neo4j.spatial.core.Polygon;
 
 import java.util.List;
 import java.util.Objects;
@@ -11,7 +12,7 @@ public abstract class GraphBuilder {
     protected List<List<Node>> polylines;
     protected Transaction tx;
 
-    public GraphBuilder(Transaction tx, Node main, List<List<Node>> polylines) {
+    protected GraphBuilder(Transaction tx, Node main, List<List<Node>> polylines) {
         this.tx = tx;
         this.main = main;
         this.polylines = polylines;
@@ -23,7 +24,7 @@ public abstract class GraphBuilder {
      * Connect unconnected way nodes of a polygon/polyline via a special relation relating to the OSMRelation
      */
     protected void connectPolylines(RelationshipType nextPolyRelType, int offset) {
-        long relationOsmId = (long) main.getProperty("relation_osm_id");
+        long relationOsmId = (long) main.getProperty(Polygon.RELATION_OSM_ID);
 
         for (List<Node> polyline : polylines) {
 
@@ -40,13 +41,13 @@ public abstract class GraphBuilder {
                 if (nextPolyRel != null) {
 
                     // If the relationship does not contain this relation ID, add it
-                    long[] ids = (long[]) nextPolyRel.getProperty("relation_osm_ids");
+                    long[] ids = (long[]) nextPolyRel.getProperty(Polygon.RELATION_OSM_IDS);
                     if (!ArrayUtils.contains(ids, relationOsmId)) {
                         long[] idsModified = new long[ids.length + 1];
                         System.arraycopy(ids, 0, idsModified, 0, ids.length);
                         idsModified[idsModified.length - 1] = relationOsmId;
 
-                        nextPolyRel.setProperty("relation_osm_ids", idsModified);
+                        nextPolyRel.setProperty(Polygon.RELATION_OSM_IDS, idsModified);
                     }
                     break;
                 }
@@ -55,7 +56,7 @@ public abstract class GraphBuilder {
                 Relationship relationship = findNextRelationship(a, b);
                 if (relationship == null) {
                     Relationship relation = a.createRelationshipTo(b, nextPolyRelType);
-                    relation.setProperty("relation_osm_ids", new long[]{relationOsmId});
+                    relation.setProperty(Polygon.RELATION_OSM_IDS, new long[]{relationOsmId});
                 }
             }
         }

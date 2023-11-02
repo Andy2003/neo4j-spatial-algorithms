@@ -5,7 +5,7 @@ import org.neo4j.graphdb.*;
 import java.util.List;
 
 public class GraphPolylineBuilder extends GraphBuilder {
-    private static Label POLYLINE_LABEL = Label.label("Polyline");
+    private static final Label POLYLINE_LABEL = Label.label("Polyline");
 
     public GraphPolylineBuilder(Transaction tx, Node main, List<List<Node>> polylines) {
         super(tx, main, polylines);

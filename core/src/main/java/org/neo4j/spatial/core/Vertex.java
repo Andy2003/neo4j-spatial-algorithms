@@ -8,7 +8,7 @@ public class Vertex {
         LEFT_MOST, INTERNAL, RIGHT_MOST, INTERSECTION;
     }
 
-    private Point point;
+    private final Point point;
     private Type type;
     private List<MonotoneChain> monotoneChains;
 
@@ -53,7 +53,7 @@ public class Vertex {
 
     @Override
     public boolean equals(Object other) {
-        return other instanceof Vertex && this.equals((Vertex) other);
+        return other instanceof Vertex vertex && this.equals(vertex);
     }
 
     @Override

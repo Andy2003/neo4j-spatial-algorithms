@@ -14,6 +14,10 @@ import java.util.StringJoiner;
 import static java.lang.String.format;
 
 public interface Polygon extends HasCRS {
+
+    String RELATION_OSM_ID = "relation_osm_id";
+    String RELATION_OSM_IDS = "relation_osm_ids";
+
     static SimplePolygon simple(Point... points) {
         return new InMemorySimplePolygon(points);
     }
@@ -74,7 +78,7 @@ public interface Polygon extends HasCRS {
                     mainPoints = points;
                 }
             }
-            if (mainPoints.length > 0) {
+            if (mainPoints != null && mainPoints.length > 0) {
                 return new InMemorySimplePolygon(mainPoints);
             } else {
                 throw new IllegalStateException("No main shell found - polygon is invalid");
@@ -274,7 +278,7 @@ public interface Polygon extends HasCRS {
         }
 
         private double distance(Point start, Point point) {
-            if (start.getCRS() == CRS.Cartesian) {
+            if (start.getCRS() == CRS.CARTESIAN) {
                 return CartesianUtil.distance(start.getCoordinate(), point.getCoordinate());
             } else {
                 Vector u = new Vector(start);
@@ -323,7 +327,7 @@ public interface Polygon extends HasCRS {
 
         @Override
         public boolean equals(Object other) {
-            return other instanceof SimplePolygon && this.equals((SimplePolygon) other);
+            return other instanceof SimplePolygon simplePolygon && this.equals(simplePolygon);
         }
 
         public boolean equals(SimplePolygon other) {

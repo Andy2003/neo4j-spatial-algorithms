@@ -22,7 +22,7 @@ public class AreaBenchmarks {
 
     private Polygon.SimplePolygon[] polygons;
     private Area geographicCalculator = AreaCalculator.getCalculator(CRS.WGS84);
-    private Area cartesianCalculator = AreaCalculator.getCalculator(CRS.Cartesian);
+    private Area cartesianCalculator = AreaCalculator.getCalculator(CRS.CARTESIAN);
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
@@ -36,23 +36,23 @@ public class AreaBenchmarks {
 
     @Setup
     public void setup() {
-        int n_US = 1000;
-        int n_EU = 1000;
-        int n_OZ = 1000;
+        int nUS = 1000;
+        int nEU = 1000;
+        int nOZ = 1000;
 
         Random random = new Random(0);
-        polygons = new Polygon.SimplePolygon[n_US + n_EU + n_OZ];
+        polygons = new Polygon.SimplePolygon[nUS + nEU + nOZ];
 
         Point originUS = Point.point(CRS.WGS84, -122.31, 37.56);    // San Francisco
-        for (int i = 0; i < n_US; i++) {
+        for (int i = 0; i < nUS; i++) {
             polygons[i] = MicroBenchmarkUtil.createPolygon(random, originUS, 0.1, 1.0, 0.1, 1.1).first();
         }
         Point originEU = Point.point(CRS.WGS84, 12.99, 55.61);      // Malmo (Neo4j)
-        for (int i = n_US; i < n_US + n_EU; i++) {
+        for (int i = nUS; i < nUS + nEU; i++) {
             polygons[i] = MicroBenchmarkUtil.createPolygon(random, originEU, 0.1, 1.0, 0.1, 1.1).first();
         }
         Point originOZ = Point.point(CRS.WGS84, 151.17, -33.90);    // Sydney
-        for (int i = n_US + n_EU; i < n_US + n_EU + n_OZ; i++) {
+        for (int i = nUS + nEU; i < nUS + nEU + nOZ; i++) {
             polygons[i] = MicroBenchmarkUtil.createPolygon(random, originOZ, 0.1, 1.0, 0.1, 1.1).first();
         }
     }

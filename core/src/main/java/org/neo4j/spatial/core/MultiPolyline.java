@@ -37,7 +37,7 @@ public class MultiPolyline implements HasCRS {
 
     @Override
     public CRS getCRS() {
-        return children.isEmpty() ? CRS.Cartesian : children.get(0).getCRS();
+        return children.isEmpty() ? CRS.CARTESIAN : children.get(0).getCRS();
     }
 
     public int dimension() {

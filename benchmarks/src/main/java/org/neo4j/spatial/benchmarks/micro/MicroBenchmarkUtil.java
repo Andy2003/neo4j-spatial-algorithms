@@ -11,6 +11,9 @@ import java.util.Random;
 
 public class MicroBenchmarkUtil {
 
+    private MicroBenchmarkUtil() {
+    }
+
     static Pair<Polygon.SimplePolygon, Polygon.SimplePolygon> createPolygon(Random random, Point origin, double minAngleStep, double maxAngleStep, double minRadius, double maxRadius) {
         List<Point> geographicPoints = new ArrayList<>();
         List<Point> cartesianPoints = new ArrayList<>();
@@ -24,7 +27,7 @@ public class MicroBenchmarkUtil {
             double x = radius * Math.cos(radians);
             double y = radius * Math.sin(radians);
             Point geographicPoint = Point.point(CRS.WGS84, originX + x, originY + y);
-            Point cartesianPoint = Point.point(CRS.Cartesian, originX + x, originY + y);
+            Point cartesianPoint = Point.point(CRS.CARTESIAN, originX + x, originY + y);
             geographicPoints.add(geographicPoint);
             cartesianPoints.add(cartesianPoint);
         }

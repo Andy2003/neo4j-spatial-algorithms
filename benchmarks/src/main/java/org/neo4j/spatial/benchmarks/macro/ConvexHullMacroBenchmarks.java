@@ -1,6 +1,5 @@
 package org.neo4j.spatial.benchmarks.macro;
 
-import org.neo4j.configuration.GraphDatabaseSettings;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -10,6 +9,7 @@ import org.neo4j.spatial.algo.cartesian.CartesianConvexHull;
 import org.neo4j.spatial.algo.wgs84.WGS84ConvexHull;
 import org.neo4j.spatial.benchmarks.JfrProfiler;
 import org.neo4j.spatial.core.MultiPolygon;
+import org.neo4j.spatial.core.Polygon;
 import org.neo4j.spatial.neo4j.UserDefinedFunctions;
 import org.neo4j.test.TestDatabaseManagementServiceBuilder;
 import org.openjdk.jmh.annotations.*;
@@ -76,7 +76,7 @@ public class ConvexHullMacroBenchmarks {
 
         try (Transaction tx = db.beginTx()) {
             for (int i = 0; i < ids.length; i++) {
-                nodes[i] = tx.findNode(label, "relation_osm_id", ids[i]);
+                nodes[i] = tx.findNode(label, Polygon.RELATION_OSM_ID, ids[i]);
 
                 if (nodes[i] == null) {
                     throw new IllegalStateException("OSMRelation not found for relation: " + ids[i]);

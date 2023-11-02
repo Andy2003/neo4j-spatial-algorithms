@@ -1,10 +1,10 @@
 package org.neo4j.spatial.algo.cartesian.intersect;
 
-import org.neo4j.spatial.algo.AlgoUtil;
-import org.neo4j.spatial.core.*;
-
 import java.util.*;
 import java.util.stream.Stream;
+
+import org.neo4j.spatial.algo.AlgoUtil;
+import org.neo4j.spatial.core.*;
 
 public class CartesianMCSweepLineIntersect extends CartesianIntersect {
     private List<MonotoneChain> activeChainList;
@@ -107,7 +107,7 @@ public class CartesianMCSweepLineIntersect extends CartesianIntersect {
 
         List<MonotoneChain> inputList = new ArrayList<>();
         inputList.addAll(getMonotoneChains(aPolygons, true));
-        inputList.addAll(getMonotoneChains(new Polyline[]{polyline}, false));
+        inputList.addAll(getMonotoneChains(new Polyline[]{ polyline }, false));
         return intersect(inputList, true).length > 0;
     }
 
@@ -123,7 +123,7 @@ public class CartesianMCSweepLineIntersect extends CartesianIntersect {
 
         List<MonotoneChain> inputList = new ArrayList<>();
         inputList.addAll(getMonotoneChains(aPolygons, true));
-        inputList.addAll(getMonotoneChains(new Polyline[]{b}, false));
+        inputList.addAll(getMonotoneChains(new Polyline[]{ b }, false));
         return intersect(inputList, false);
     }
 
@@ -156,7 +156,7 @@ public class CartesianMCSweepLineIntersect extends CartesianIntersect {
 
         List<MonotoneChain> inputList = new ArrayList<>();
         inputList.addAll(getMonotoneChains(aPolylines, true));
-        inputList.addAll(getMonotoneChains(new Polyline[]{b}, false));
+        inputList.addAll(getMonotoneChains(new Polyline[]{ b }, false));
         return intersect(inputList, false);
     }
 
@@ -167,7 +167,7 @@ public class CartesianMCSweepLineIntersect extends CartesianIntersect {
 
         Set<Double> angleSet = new HashSet<>();
         angleSet.addAll(computeAngles(a.toLineSegments()));
-        angleSet.addAll(computeAngles(new LineSegment[]{b}));
+        angleSet.addAll(computeAngles(new LineSegment[]{ b }));
         computeSweepDirection(angleSet);
 
         List<MonotoneChain> inputList = new ArrayList<>();
@@ -191,8 +191,8 @@ public class CartesianMCSweepLineIntersect extends CartesianIntersect {
         computeSweepDirection(angleSet);
 
         List<MonotoneChain> inputList = new ArrayList<>();
-        inputList.addAll(getMonotoneChains(new Polyline[]{a}, true));
-        inputList.addAll(getMonotoneChains(new Polyline[]{b}, false));
+        inputList.addAll(getMonotoneChains(new Polyline[]{ a }, true));
+        inputList.addAll(getMonotoneChains(new Polyline[]{ b }, false));
         return intersect(inputList, false);
     }
 
@@ -202,11 +202,11 @@ public class CartesianMCSweepLineIntersect extends CartesianIntersect {
 
         Set<Double> angleSet = new HashSet<>();
         angleSet.addAll(computeAngles(a.toLineSegments()));
-        angleSet.addAll(computeAngles(new LineSegment[]{b}));
+        angleSet.addAll(computeAngles(new LineSegment[]{ b }));
         computeSweepDirection(angleSet);
 
         List<MonotoneChain> inputList = new ArrayList<>();
-        inputList.addAll(getMonotoneChains(new Polyline[]{a}, true));
+        inputList.addAll(getMonotoneChains(new Polyline[]{ a }, true));
 
         MonotoneChain bChain = new MonotoneChain();
         bChain.add(createRotatedLineSegment(b));
@@ -283,48 +283,50 @@ public class CartesianMCSweepLineIntersect extends CartesianIntersect {
         }
 
         Vertex v;
-        MonotoneChain MCa;
+        MonotoneChain mcA;
         while (!this.activeChainList.isEmpty()) {
-            MCa = this.activeChainList.get(0);
-            v = MCa.getFrontVertex();
-            MCa.advance();
-            insertMonotoneChainInACL(MCa);
+            mcA = this.activeChainList.get(0);
+            v = mcA.getFrontVertex();
+            mcA.advance();
+            insertMonotoneChainInACL(mcA);
 
             switch (v.getType()) {
                 case LEFT_MOST:
-                    insertInSCL(MCa, v.getPoint().getCoordinate()[0]);
-                    findIntersection(MCa, getPrevious(this.sweepingChainList, MCa));
-                    findIntersection(MCa, getNext(this.sweepingChainList, MCa));
+                    insertInSCL(mcA, v.getPoint().getCoordinate()[0]);
+                    findIntersection(mcA, getPrevious(this.sweepingChainList, mcA));
+                    findIntersection(mcA, getNext(this.sweepingChainList, mcA));
                     break;
                 case INTERNAL:
-                    findIntersection(MCa, getPrevious(this.sweepingChainList, MCa));
-                    findIntersection(MCa, getNext(this.sweepingChainList, MCa));
+                    findIntersection(mcA, getPrevious(this.sweepingChainList, mcA));
+                    findIntersection(mcA, getNext(this.sweepingChainList, mcA));
                     break;
-                case RIGHT_MOST:
-                    MonotoneChain MCp = getPrevious(this.sweepingChainList, MCa);
-                    MonotoneChain MCn = getNext(this.sweepingChainList, MCa);
-                    this.sweepingChainList.remove(MCa);
-                    this.activeChainList.remove(MCa);
-                    findIntersection(MCp, MCn);
+                case RIGHT_MOST: {
+                    MonotoneChain previous = getPrevious(this.sweepingChainList, mcA);
+                    MonotoneChain next = getNext(this.sweepingChainList, mcA);
+                    this.sweepingChainList.remove(mcA);
+                    this.activeChainList.remove(mcA);
+                    findIntersection(previous, next);
                     break;
-                case INTERSECTION:
-                    MonotoneChain finalMCa = MCa;
-                    MonotoneChain MCb = v.getMonotoneChains().stream().filter(c -> !c.equals(finalMCa)).findFirst().get();
-                    MCb.advance();
-                    insertMonotoneChainInACL(MCb);
-                    swapAccordingToSCL(new ArrayList<>(Arrays.asList(MCa, MCb)), v.getPoint().getCoordinate()[0]);
-                    MonotoneChain previous = getPrevious(sweepingChainList, MCb);
-                    if (previous != null && MCa.equals(previous)) {
-                        findIntersection(MCa, getPrevious(sweepingChainList, MCa));
-                        findIntersection(MCb, getNext(sweepingChainList, MCb));
+                }
+                case INTERSECTION: {
+                    MonotoneChain finalMCa = mcA;
+                    MonotoneChain mcB = v.getMonotoneChains().stream().filter(c -> !c.equals(finalMCa)).findFirst().orElseThrow();
+                    mcB.advance();
+                    insertMonotoneChainInACL(mcB);
+                    swapAccordingToSCL(new ArrayList<>(Arrays.asList(mcA, mcB)), v.getPoint().getCoordinate()[0]);
+                    MonotoneChain previous = getPrevious(sweepingChainList, mcB);
+                    if (previous != null && mcA.equals(previous)) {
+                        findIntersection(mcA, getPrevious(sweepingChainList, mcA));
+                        findIntersection(mcB, getNext(sweepingChainList, mcB));
                     } else {
-                        findIntersection(MCb, getPrevious(sweepingChainList, MCb));
-                        findIntersection(MCa, getNext(sweepingChainList, MCa));
+                        findIntersection(mcB, getPrevious(sweepingChainList, mcB));
+                        findIntersection(mcA, getNext(sweepingChainList, mcA));
                     }
                     addToOutput(v.getPoint());
                     break;
+                }
             }
-            if (shortcut && outputList.size() > 0) {
+            if (shortcut && !outputList.isEmpty()) {
                 return outputList.toArray(new Point[0]);
             }
         }
@@ -333,9 +335,9 @@ public class CartesianMCSweepLineIntersect extends CartesianIntersect {
     }
 
     private void addToOutput(Point rotatedPoint) {
-        Point point = Point.point(CRS.Cartesian, AlgoUtil.rotate(rotatedPoint.getCoordinate(), -this.sweepAngle));
+        Point point = Point.point(CRS.CARTESIAN, AlgoUtil.rotate(rotatedPoint.getCoordinate(), -this.sweepAngle));
         for (Point inList : outputList) {
-            if (AlgoUtil.equal(point.getCoordinate(), inList.getCoordinate())) {
+            if (AlgoUtil.isEqual(point.getCoordinate(), inList.getCoordinate())) {
                 return;
             }
         }
@@ -496,7 +498,8 @@ public class CartesianMCSweepLineIntersect extends CartesianIntersect {
         if (sharedPoint != null) {
             //Check if point isn't already in the output and the two chains are from different polygons by comparing signs
             if (!outputList.contains(LineSegment.sharedPoint(aSegment, bSegment)) &&
-                    ((a.getId() - splitId ^ b.getId() - splitId) < 0)) {
+                    ((a.getId() - splitId ^ b.getId() - splitId) < 0))
+            {
                 addToOutput(sharedPoint);
             }
             return;
@@ -524,7 +527,7 @@ public class CartesianMCSweepLineIntersect extends CartesianIntersect {
      * sort them in the sweeping chain list based on their angle at the sweep line.
      *
      * @param toSort The list of chains which will be re-sorted in the sweeping chain list
-     * @param x      The x-coordinate of the sweep line
+     * @param x The x-coordinate of the sweep line
      */
     private void swapAccordingToSCL(List<MonotoneChain> toSort, double x) {
         toSort.sort((a, b) -> {
@@ -553,7 +556,7 @@ public class CartesianMCSweepLineIntersect extends CartesianIntersect {
      * If this y-value coincides with another chain in the list, sort them by their angle.
      *
      * @param chain The chain to be inserted.
-     * @param x     The x-coordinate of the sweep line
+     * @param x The x-coordinate of the sweep line
      */
     private void insertInSCL(MonotoneChain chain, double x) {
         this.sweepingChainList.add(chain);
@@ -561,7 +564,7 @@ public class CartesianMCSweepLineIntersect extends CartesianIntersect {
             double aY = a.getY(x);
             double bY = b.getY(x);
 
-            if (AlgoUtil.equal(aY, bY)) {
+            if (AlgoUtil.isEqual(aY, bY)) {
                 double angleA = a.getAngle(x);
                 double angleB = b.getAngle(x);
 
@@ -575,7 +578,7 @@ public class CartesianMCSweepLineIntersect extends CartesianIntersect {
     /**
      * Get the next monotone chain from the list based on the position of the input chain.
      *
-     * @param list  The list of monotone chains to search
+     * @param list The list of monotone chains to search
      * @param chain The input chain
      * @return The next chain in the list based on the input chain, and null if no next chain exists.
      */
@@ -592,7 +595,7 @@ public class CartesianMCSweepLineIntersect extends CartesianIntersect {
     /**
      * Get the previous monotone chain from the list based on the position of the input chain.
      *
-     * @param list  The list of monotone chains to search
+     * @param list The list of monotone chains to search
      * @param chain The input chain
      * @return The previous chain in the list based on the input chain, and null if no previous chain exists.
      */
