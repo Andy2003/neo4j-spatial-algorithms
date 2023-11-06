@@ -12,7 +12,7 @@ import org.neo4j.spatial.benchmarks.JfrProfiler;
 import org.neo4j.spatial.core.CRS;
 import org.neo4j.spatial.core.Point;
 import org.neo4j.spatial.core.Polygon;
-import org.neo4j.spatial.neo4j.UserDefinedFunctions;
+import org.neo4j.spatial.neo4j.api.osm.utils.OSMUtils;
 import org.neo4j.test.TestDatabaseManagementServiceBuilder;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -98,7 +98,7 @@ public class LinearReferenceMacroBenchmarks {
                 geographicDist = 0;
                 cartesianDist = 0;
 
-                Polygon.SimplePolygon polygon = UserDefinedFunctions.getArrayPolygon(nodes[i]).getChildren().get(0).getPolygon();
+                Polygon.SimplePolygon polygon = OSMUtils.getArrayPolygon(nodes[i]).getChildren().get(0).getPolygon();
 
                 for (int j = 0; j < polygon.getPoints().length - 1; j++) {
                     geographicDist += geographicDistanceCalc.distance(polygon.getPoints()[j], polygon.getPoints()[j+1]);
@@ -131,7 +131,7 @@ public class LinearReferenceMacroBenchmarks {
     public void testCartesianLinearReferenceGraph(Blackhole bh) {
         try (Transaction tx = db.beginTx()) {
             for (int i = 0; i < nodes.length; i++) {
-                Polygon.SimplePolygon polygon = UserDefinedFunctions.getGraphNodePolygon(nodes[i]).getChildren().get(0).getPolygon();
+                Polygon.SimplePolygon polygon = OSMUtils.getGraphNodePolygon(nodes[i]).getChildren().get(0).getPolygon();
 
                 bh.consume(LinearReferenceCalculator.getCalculator(CRS.CARTESIAN).reference(polygon, start[i], direction[i], cartesianDistance[i]));
             }
@@ -143,7 +143,7 @@ public class LinearReferenceMacroBenchmarks {
     public void testGeographicLinearReferenceGraph(Blackhole bh) {
         try (Transaction tx = db.beginTx()) {
             for (int i = 0; i < nodes.length; i++) {
-                Polygon.SimplePolygon polygon = UserDefinedFunctions.getGraphNodePolygon(nodes[i]).getChildren().get(0).getPolygon();
+                Polygon.SimplePolygon polygon = OSMUtils.getGraphNodePolygon(nodes[i]).getChildren().get(0).getPolygon();
 
                 bh.consume(LinearReferenceCalculator.getCalculator(CRS.WGS84).reference(polygon, start[i], direction[i], geographicDistance[i]));
             }
@@ -156,7 +156,7 @@ public class LinearReferenceMacroBenchmarks {
         try {
             try (Transaction tx = db.beginTx()) {
                 for (int i = 0; i < nodes.length; i++) {
-                    Polygon.SimplePolygon polygon = UserDefinedFunctions.getArrayPolygon(nodes[i]).getChildren().get(0).getPolygon();
+                    Polygon.SimplePolygon polygon = OSMUtils.getArrayPolygon(nodes[i]).getChildren().get(0).getPolygon();
 
                     bh.consume(LinearReferenceCalculator.getCalculator(CRS.CARTESIAN).reference(polygon, start[i], direction[i], cartesianDistance[i]));
                 }
@@ -172,7 +172,7 @@ public class LinearReferenceMacroBenchmarks {
     public void testGeographicLinearReferenceProperty(Blackhole bh) {
         try (Transaction tx = db.beginTx()) {
             for (int i = 0; i < nodes.length; i++) {
-                Polygon.SimplePolygon polygon = UserDefinedFunctions.getArrayPolygon(nodes[i]).getChildren().get(0).getPolygon();
+                Polygon.SimplePolygon polygon = OSMUtils.getArrayPolygon(nodes[i]).getChildren().get(0).getPolygon();
 
                 bh.consume(LinearReferenceCalculator.getCalculator(CRS.WGS84).reference(polygon, start[i], direction[i], geographicDistance[i]));
             }

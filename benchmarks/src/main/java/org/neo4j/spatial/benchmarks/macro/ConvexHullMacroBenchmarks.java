@@ -10,7 +10,7 @@ import org.neo4j.spatial.algo.wgs84.WGS84ConvexHull;
 import org.neo4j.spatial.benchmarks.JfrProfiler;
 import org.neo4j.spatial.core.MultiPolygon;
 import org.neo4j.spatial.core.Polygon;
-import org.neo4j.spatial.neo4j.UserDefinedFunctions;
+import org.neo4j.spatial.neo4j.api.osm.utils.OSMUtils;
 import org.neo4j.test.TestDatabaseManagementServiceBuilder;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -95,7 +95,7 @@ public class ConvexHullMacroBenchmarks {
     public void testCartesianConvexHullGraph(Blackhole bh) {
         try (Transaction tx = db.beginTx()) {
             for (Node osmRelation : nodes) {
-                MultiPolygon polygon = UserDefinedFunctions.getGraphNodePolygon(osmRelation);
+                MultiPolygon polygon = OSMUtils.getGraphNodePolygon(osmRelation);
 
                 bh.consume(CartesianConvexHull.convexHull(polygon));
 
@@ -108,7 +108,7 @@ public class ConvexHullMacroBenchmarks {
     public void testGeographicConvexHullGraph(Blackhole bh) {
         try (Transaction tx = db.beginTx()) {
             for (Node osmRelation : nodes) {
-                MultiPolygon polygon = UserDefinedFunctions.getGraphNodePolygon(osmRelation);
+                MultiPolygon polygon = OSMUtils.getGraphNodePolygon(osmRelation);
 
                 bh.consume(WGS84ConvexHull.convexHull(polygon));
             }
@@ -121,7 +121,7 @@ public class ConvexHullMacroBenchmarks {
         try {
             try (Transaction tx = db.beginTx()) {
                 for (Node osmRelation : nodes) {
-                    MultiPolygon polygon = UserDefinedFunctions.getArrayPolygon(osmRelation);
+                    MultiPolygon polygon = OSMUtils.getArrayPolygon(osmRelation);
 
                     bh.consume(CartesianConvexHull.convexHull(polygon));
                 }
@@ -137,7 +137,7 @@ public class ConvexHullMacroBenchmarks {
     public void testGeographicConvexHullProperty(Blackhole bh) {
         try (Transaction tx = db.beginTx()) {
             for (Node osmRelation : nodes) {
-                MultiPolygon polygon = UserDefinedFunctions.getArrayPolygon(osmRelation);
+                MultiPolygon polygon = OSMUtils.getArrayPolygon(osmRelation);
 
                 bh.consume(WGS84ConvexHull.convexHull(polygon));
             }

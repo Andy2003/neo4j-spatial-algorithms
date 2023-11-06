@@ -1,8 +1,9 @@
-package org.neo4j.spatial.neo4j;
+package org.neo4j.spatial.neo4j.api.osm.model;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.neo4j.graphdb.*;
 import org.neo4j.spatial.core.Polygon;
+import org.neo4j.spatial.neo4j.api.osm.Relation;
 
 import java.util.List;
 import java.util.Objects;

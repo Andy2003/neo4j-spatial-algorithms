@@ -1,4 +1,4 @@
-package org.neo4j.spatial.neo4j;
+package org.neo4j.spatial.neo4j.api.osm.model;
 
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
@@ -8,6 +8,7 @@ import org.neo4j.spatial.algo.CCW;
 import org.neo4j.spatial.algo.CCWCalculator;
 import org.neo4j.spatial.core.Point;
 import org.neo4j.spatial.core.PolygonUtil;
+import org.neo4j.spatial.neo4j.api.osm.Relation;
 
 public class Neo4jSimpleGraphIDPolygon extends Neo4jSimpleGraphPolygon {
     private KernelTransaction ktx;

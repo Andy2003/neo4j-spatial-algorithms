@@ -12,7 +12,7 @@ import org.neo4j.spatial.core.CRS;
 import org.neo4j.spatial.core.MultiPolygon;
 import org.neo4j.spatial.core.MultiPolyline;
 import org.neo4j.spatial.core.Polygon;
-import org.neo4j.spatial.neo4j.UserDefinedFunctions;
+import org.neo4j.spatial.neo4j.api.osm.utils.OSMUtils;
 import org.neo4j.test.TestDatabaseManagementServiceBuilder;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -88,8 +88,8 @@ public class IntersectMacroBenchmarks {
     public  void testCartesianIntersectNaiveArray(Blackhole bh) {
         try (Transaction tx = db.beginTx()) {
             for (Node osmRelation : nodes) {
-                MultiPolygon polygon = UserDefinedFunctions.getArrayPolygon(osmRelation);
-                MultiPolyline polyLine = UserDefinedFunctions.getArrayPolyline(polylineNode);
+                MultiPolygon polygon = OSMUtils.getArrayPolygon(osmRelation);
+                MultiPolyline polyLine = OSMUtils.getArrayPolyline(polylineNode);
                 bh.consume(cartesianNaiveCalculator.intersect(polygon, polyLine));
 
             }
@@ -101,8 +101,8 @@ public class IntersectMacroBenchmarks {
     public  void testCartesianIntersectSweepArray(Blackhole bh) {
         try (Transaction tx = db.beginTx()) {
             for (Node osmRelation : nodes) {
-                MultiPolygon polygon = UserDefinedFunctions.getArrayPolygon(osmRelation);
-                MultiPolyline polyLine = UserDefinedFunctions.getArrayPolyline(polylineNode);
+                MultiPolygon polygon = OSMUtils.getArrayPolygon(osmRelation);
+                MultiPolyline polyLine = OSMUtils.getArrayPolyline(polylineNode);
                 bh.consume(cartesianSweepCalculator.intersect(polygon, polyLine));
             }
             tx.commit();
@@ -114,8 +114,8 @@ public class IntersectMacroBenchmarks {
         try {
             try (Transaction tx = db.beginTx()) {
                 for (Node osmRelation : nodes) {
-                    MultiPolygon polygon = UserDefinedFunctions.getArrayPolygon(osmRelation);
-                    MultiPolyline polyLine = UserDefinedFunctions.getArrayPolyline(polylineNode);
+                    MultiPolygon polygon = OSMUtils.getArrayPolygon(osmRelation);
+                    MultiPolyline polyLine = OSMUtils.getArrayPolyline(polylineNode);
                     bh.consume(geographicNaiveCalculator.intersect(polygon, polyLine));
                 }
                 tx.commit();
@@ -130,8 +130,8 @@ public class IntersectMacroBenchmarks {
     public  void testGeographicIntersectSweepArray(Blackhole bh) {
         try (Transaction tx = db.beginTx()) {
             for (Node osmRelation : nodes) {
-                MultiPolygon polygon = UserDefinedFunctions.getArrayPolygon(osmRelation);
-                MultiPolyline polyLine = UserDefinedFunctions.getArrayPolyline(polylineNode);
+                MultiPolygon polygon = OSMUtils.getArrayPolygon(osmRelation);
+                MultiPolyline polyLine = OSMUtils.getArrayPolyline(polylineNode);
 
                 bh.consume(geographicSweepCalculator.intersect(polygon, polyLine));
             }
@@ -143,8 +143,8 @@ public class IntersectMacroBenchmarks {
     public  void testCartesianIntersectNaiveGraph(Blackhole bh) {
         try (Transaction tx = db.beginTx()) {
             for (Node osmRelation : nodes) {
-                MultiPolygon polygon = UserDefinedFunctions.getGraphNodePolygon(osmRelation);
-                MultiPolyline polyLine = UserDefinedFunctions.getGraphNodePolyline(polylineNode);
+                MultiPolygon polygon = OSMUtils.getGraphNodePolygon(osmRelation);
+                MultiPolyline polyLine = OSMUtils.getGraphNodePolyline(polylineNode);
                 bh.consume(cartesianNaiveCalculator.intersect(polygon, polyLine));
 
             }
@@ -156,8 +156,8 @@ public class IntersectMacroBenchmarks {
     public  void testCartesianIntersectSweepGraph(Blackhole bh) {
         try (Transaction tx = db.beginTx()) {
             for (Node osmRelation : nodes) {
-                MultiPolygon polygon = UserDefinedFunctions.getGraphNodePolygon(osmRelation);
-                MultiPolyline polyLine = UserDefinedFunctions.getGraphNodePolyline(polylineNode);
+                MultiPolygon polygon = OSMUtils.getGraphNodePolygon(osmRelation);
+                MultiPolyline polyLine = OSMUtils.getGraphNodePolyline(polylineNode);
                 bh.consume(cartesianSweepCalculator.intersect(polygon, polyLine));
             }
             tx.commit();
@@ -169,8 +169,8 @@ public class IntersectMacroBenchmarks {
         try {
             try (Transaction tx = db.beginTx()) {
                 for (Node osmRelation : nodes) {
-                    MultiPolygon polygon = UserDefinedFunctions.getGraphNodePolygon(osmRelation);
-                    MultiPolyline polyLine = UserDefinedFunctions.getGraphNodePolyline(polylineNode);
+                    MultiPolygon polygon = OSMUtils.getGraphNodePolygon(osmRelation);
+                    MultiPolyline polyLine = OSMUtils.getGraphNodePolyline(polylineNode);
                     bh.consume(geographicNaiveCalculator.intersect(polygon, polyLine));
                 }
                 tx.commit();
@@ -185,8 +185,8 @@ public class IntersectMacroBenchmarks {
     public  void testGeographicIntersectSweepGraph(Blackhole bh) {
         try (Transaction tx = db.beginTx()) {
             for (Node osmRelation : nodes) {
-                MultiPolygon polygon = UserDefinedFunctions.getGraphNodePolygon(osmRelation);
-                MultiPolyline polyLine = UserDefinedFunctions.getGraphNodePolyline(polylineNode);
+                MultiPolygon polygon = OSMUtils.getGraphNodePolygon(osmRelation);
+                MultiPolyline polyLine = OSMUtils.getGraphNodePolyline(polylineNode);
                 bh.consume(geographicSweepCalculator.intersect(polygon, polyLine));
             }
             tx.commit();

@@ -1,4 +1,4 @@
-package org.neo4j.spatial.neo4j;
+package org.neo4j.spatial.neo4j.api.osm;
 
 import org.neo4j.graphdb.RelationshipType;
 

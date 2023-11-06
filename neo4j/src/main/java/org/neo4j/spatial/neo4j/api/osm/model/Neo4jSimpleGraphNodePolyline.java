@@ -1,9 +1,10 @@
-package org.neo4j.spatial.neo4j;
+package org.neo4j.spatial.neo4j.api.osm.model;
 
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.spatial.core.CRS;
 import org.neo4j.spatial.core.Point;
+import org.neo4j.spatial.neo4j.api.osm.Relation;
 
 public class Neo4jSimpleGraphNodePolyline extends Neo4jSimpleGraphPolyline {
     private CRS crs;

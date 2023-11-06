@@ -1,4 +1,4 @@
-package org.neo4j.spatial.neo4j;
+package org.neo4j.spatial.neo4j.api.osm.model;
 
 import org.neo4j.internal.helpers.collection.Iterators;
 import org.neo4j.internal.kernel.api.NodeCursor;
@@ -9,6 +9,7 @@ import org.neo4j.kernel.impl.api.TokenAccess;
 import org.neo4j.memory.EmptyMemoryTracker;
 import org.neo4j.spatial.core.CRS;
 import org.neo4j.spatial.core.Point;
+import org.neo4j.spatial.neo4j.api.osm.utils.CRSConverter;
 
 import java.util.Arrays;
 import java.util.Objects;

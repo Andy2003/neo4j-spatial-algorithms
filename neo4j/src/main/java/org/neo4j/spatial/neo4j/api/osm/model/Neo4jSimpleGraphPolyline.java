@@ -1,5 +1,6 @@
-package org.neo4j.spatial.neo4j;
+package org.neo4j.spatial.neo4j.api.osm.model;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Objects;
 
@@ -16,144 +17,132 @@ import org.neo4j.internal.helpers.collection.Pair;
 import org.neo4j.kernel.impl.traversal.MonoDirectionalTraversalDescription;
 import org.neo4j.spatial.algo.Distance;
 import org.neo4j.spatial.algo.DistanceCalculator;
-import org.neo4j.spatial.core.CRS;
 import org.neo4j.spatial.core.Point;
 import org.neo4j.spatial.core.Polygon;
+import org.neo4j.spatial.core.Polyline;
+import org.neo4j.spatial.neo4j.api.osm.Relation;
 
 import static java.lang.String.format;
 
-public abstract class Neo4jSimpleGraphPolygon implements Polygon.SimplePolygon {
+public abstract class Neo4jSimpleGraphPolyline implements Polyline {
     private final long osmRelationId;
-    private final CRS crs;
     private Iterator<Node> nodeIterator;
-    Node firstWayNode;
+    boolean traversing;
+    Node pointer;
+    Node start;
+    Node main;
+    Point startPoint;
 
-    protected Neo4jSimpleGraphPolygon(Node firstWayNode, long osmRelationId) {
+    protected Neo4jSimpleGraphPolyline(Node main, long osmRelationId) {
         this.osmRelationId = osmRelationId;
-        this.firstWayNode = firstWayNode;
-        crs = extractPoint(firstWayNode).getCRS();
-    }
-
-    @Override
-    public CRS getCRS() {
-        return crs;
+        this.traversing = false;
+        this.pointer = null;
+        this.main = main;
+        this.start = main;
     }
 
     @Override
     public int dimension() {
-        return extractPoint(this.firstWayNode).dimension();
-    }
-
-    @Override
-    public boolean isSimple() {
-        return true;
+        return extractPoint(this.main).dimension();
     }
 
     @Override
     public String toString() {
-        return format("Neo4jSimpleGraphNodePolygon(%s)", this.firstWayNode);
+        return format("Neo4jSimpleGraphNodePolygon%s", Arrays.toString(getPoints()));
     }
 
     private Traverser getNewTraverser(Node start) {
+        // TODO: With Direction.BOTH we need uniqueness checks, which cost memory and time. Perhaps better to check in one direction only
         return new MonoDirectionalTraversalDescription()
                 .depthFirst()
                 .relationships(Relation.NEXT, Direction.BOTH)
-                .relationships(Relation.NEXT_IN_POLYGON, Direction.BOTH)
-                .uniqueness(Uniqueness.NONE)
-                .evaluator(new WayEvaluator(osmRelationId, null, null)).traverse(start);
+                .relationships(Relation.NEXT_IN_POLYLINE)
+                .uniqueness(Uniqueness.NODE_GLOBAL)
+                .evaluator(new WayEvaluator(osmRelationId, Relation.NEXT, Direction.OUTGOING)).traverse(start);
     }
 
-    private Traverser getNewTraverser(Node start, Direction nextDirection, Direction nextInPolygonDirection) {
+    private Traverser getNewTraverser(Node start, Relation relation, Direction direction) {
         return new MonoDirectionalTraversalDescription()
                 .depthFirst()
                 .relationships(Relation.NEXT, Direction.BOTH)
-                .relationships(Relation.NEXT_IN_POLYGON)
+                .relationships(Relation.NEXT_IN_POLYLINE)
                 .uniqueness(Uniqueness.NONE)
-                .evaluator(new WayEvaluator(osmRelationId, nextDirection, nextInPolygonDirection)).traverse(start);
+                .evaluator(new WayEvaluator(osmRelationId, relation, direction)).traverse(start);
     }
 
     @Override
     public boolean fullyTraversed() {
         if (this.nodeIterator != null) {
-            return !this.nodeIterator.hasNext();
+            return !this.nodeIterator.hasNext() && this.traversing;
         }
         return false;
     }
 
     @Override
     public void startTraversal(Point startPoint, Point directionPoint) {
-        Iterator<Node> iterator = getNewTraverser(this.firstWayNode).nodes().iterator();
+        Iterator<Node> iterator = getNewTraverser(this.main).nodes().iterator();
+        this.traversing = false;
 
         Distance calculator = DistanceCalculator.getCalculator(startPoint);
-
-        Point firstPoint = null;
-        Node start = null;
 
         double minDistance = Double.MAX_VALUE;
         while (iterator.hasNext()) {
             Node next = iterator.next();
             Point extracted = extractPoint(next);
-            if (firstPoint == null) {
-                firstPoint = extracted;
-            } else if (firstPoint.equals(extracted)) {
-                // Having a ´break' in node.getRelationship causes a RelationshipTraversalCursor cleanup error, so we need to exhaust the iterator later to avoid this
-                break;
-            }
 
             double currentDistance = calculator.distance(extracted, startPoint);
             if (currentDistance <= minDistance) {
                 minDistance = currentDistance;
-                start = next;
+                this.start = next;
+                this.pointer = next;
+                this.startPoint = extracted;
             }
         }
-        // Exhaust iterator to avoid transaction closing bug with RelationshipTraversalCursor
-        while (iterator.hasNext()) {
-            iterator.next();
-        }
-        Pair<Direction, Direction> directions = getClosestNeighborToDirection(start, directionPoint);
-        this.nodeIterator = getNewTraverser(start, directions.first(), directions.other()).nodes().iterator();
+
+        Pair<Relation, Direction> relationDirection = getClosestNeighborToDirection(directionPoint);
+        this.nodeIterator = getNewTraverser(this.start, relationDirection.first(), relationDirection.other()).nodes().iterator();
     }
 
-    private Pair<Direction, Direction> getClosestNeighborToDirection(Node wayNode, Point directionPoint) {
+    private Pair<Relation, Direction> getClosestNeighborToDirection(Point directionPoint) {
         double minDistance = Double.MAX_VALUE;
         Direction minDirection = null;
-        boolean nextInPolygon = true;
+        Relation minRelation = null;
 
         Distance calculator = DistanceCalculator.getCalculator(directionPoint);
 
-        for (Relationship relationship : wayNode.getRelationships(Relation.NEXT_IN_POLYGON)) {
-            if (WayEvaluator.nextInPolygon(relationship, osmRelationId)) {
-                Node other = relationship.getOtherNode(wayNode);
+        for (Relationship relationship : this.start.getRelationships(Relation.NEXT_IN_POLYLINE)) {
+            if (WayEvaluator.partOfPolyline(relationship, osmRelationId)) {
+                Node other = relationship.getOtherNode(this.start);
 
                 double currentDistance = calculator.distance(directionPoint, extractPoint(other));
                 if (currentDistance < minDistance) {
                     minDistance = currentDistance;
-                    minDirection = relationship.getStartNode().equals(wayNode) ? Direction.OUTGOING : Direction.INCOMING;
+                    minRelation = Relation.NEXT_IN_POLYGON;
+                    minDirection = relationship.getStartNode().equals(this.start) ? Direction.OUTGOING : Direction.INCOMING;
                 }
             }
         }
 
-        for (Relationship relationship : wayNode.getRelationships(Relation.NEXT)) {
-            Node other = relationship.getOtherNode(wayNode);
+        for (Relationship relationship : this.start.getRelationships(Relation.NEXT)) {
+            Node other = relationship.getOtherNode(this.start);
 
             double currentDistance = calculator.distance(directionPoint, extractPoint(other));
             if (currentDistance < minDistance) {
                 minDistance = currentDistance;
-                minDirection = relationship.getStartNode().equals(wayNode) ? Direction.OUTGOING : Direction.INCOMING;
-                nextInPolygon = false;
+                minDirection = relationship.getStartNode().equals(this.start) ? Direction.OUTGOING : Direction.INCOMING;
+                minRelation = Relation.NEXT;
             }
         }
 
-        if (nextInPolygon) {
-            return Pair.of(null, minDirection);
-        } else {
-            return Pair.of(minDirection, null);
-        }
+        return Pair.of(minRelation, minDirection);
     }
 
     @Override
     public void startTraversal() {
-        this.nodeIterator = getNewTraverser(firstWayNode).nodes().iterator();
+        this.start = main;
+        this.pointer = main;
+        this.traversing = false;
+        this.nodeIterator = getNewTraverser(this.start).nodes().iterator();
     }
 
     abstract Point extractPoint(Node node);
@@ -166,50 +155,46 @@ public abstract class Neo4jSimpleGraphPolygon implements Polygon.SimplePolygon {
         return this.nodeIterator.next();
     }
 
-    protected Node[] traverseWholePolygon() {
-        return Iterables.stream(getNewTraverser(firstWayNode).nodes()).toArray(Node[]::new);
+    protected Node[] traverseWholePolyline(Node main) {
+        return Iterables.stream(getNewTraverser(main).nodes()).toArray(Node[]::new);
     }
 
     private static class WayEvaluator implements Evaluator {
         private final long relationId;
-        private final Direction nextDirection;
-        private final Direction nextInPolygonDirection;
+        private final Relation relation;
+        private final Direction direction;
         private boolean firstWay;
 
-        private String firstLocationNode = null;
-        private String previousLocationNode = null;
-        private boolean finished;
+        private String  previousLocationNode;
         private Direction lastNextDirection;
 
-        public WayEvaluator(long relationId, Direction nextDirection, Direction nextInPolygonDirection) {
+        public WayEvaluator(long relationId, Relation relation, Direction direction) {
             this.relationId = relationId;
-            this.nextDirection = nextDirection;
-            this.nextInPolygonDirection = nextInPolygonDirection;
+            this.relation = relation;
+            this.direction = direction;
             this.firstWay = true;
-            this.finished = false;
         }
 
         @Override
         public Evaluation evaluate(Path path) {
-            if (finished) {
+            Relationship rel = path.lastRelationship();
+            Node endNode = path.endNode();
+            String  locationNode = getLocationNode(endNode);
+
+            if (path.length() == 1
+                    && !(rel.isType(this.relation) && validDirection(rel, endNode, this.direction)))
+            {
                 return Evaluation.EXCLUDE_AND_PRUNE;
             }
 
-            Relationship rel = path.lastRelationship();
-            Node endNode = path.endNode();
-            String locationNode = getLocationNode(endNode);
-
-            if (path.length() == 1
-                    && (rel.isType(Relation.NEXT) && nextInPolygonDirection != null
-                    || rel.isType(Relation.NEXT_IN_POLYGON) && nextDirection != null))
-            {
-                return Evaluation.EXCLUDE_AND_PRUNE;
-
+            if (rel == null) {
+                previousLocationNode = locationNode;
+                return Evaluation.INCLUDE_AND_CONTINUE;
             }
 
             if (Objects.equals(locationNode, previousLocationNode)) {
-                if (rel.isType(Relation.NEXT_IN_POLYGON)) {
-                    if (!nextInPolygon(rel) || !validDirection(rel, endNode, nextInPolygonDirection)) {
+                if (rel.isType(Relation.NEXT_IN_POLYLINE)) {
+                    if (!partOfPolyline(rel) || !validDirection(rel, endNode, this.direction)) {
                         return Evaluation.EXCLUDE_AND_PRUNE;
                     }
                     firstWay = false;
@@ -218,23 +203,12 @@ public abstract class Neo4jSimpleGraphPolygon implements Polygon.SimplePolygon {
                 return Evaluation.EXCLUDE_AND_CONTINUE;
             }
 
-            if (Objects.equals(firstLocationNode, locationNode)) {
-                finished = true;
-                return Evaluation.INCLUDE_AND_PRUNE;
-            }
-
-            if (rel == null) {
-                firstLocationNode = locationNode;
-                previousLocationNode = locationNode;
-                return Evaluation.INCLUDE_AND_CONTINUE;
-            }
-
-            if (rel.isType(Relation.NEXT_IN_POLYGON)) {
-                if (!validDirection(rel, endNode, nextInPolygonDirection)) {
+            if (rel.isType(Relation.NEXT_IN_POLYLINE)) {
+                if (!validDirection(rel, endNode, direction)) {
                     return Evaluation.EXCLUDE_AND_PRUNE;
                 }
 
-                if (nextInPolygon(rel)) {
+                if (partOfPolyline(rel)) {
                     firstWay = false;
                     lastNextDirection = null;
                     previousLocationNode = locationNode;
@@ -245,7 +219,7 @@ public abstract class Neo4jSimpleGraphPolygon implements Polygon.SimplePolygon {
             }
 
             if (rel.isType(Relation.NEXT) && validDirection(rel, endNode, lastNextDirection)) {
-                if (!validDirection(rel, endNode, nextDirection) && firstWay) {
+                if (!validDirection(rel, endNode, direction) && firstWay) {
                     return Evaluation.EXCLUDE_AND_PRUNE;
                 }
 
@@ -266,12 +240,13 @@ public abstract class Neo4jSimpleGraphPolygon implements Polygon.SimplePolygon {
                     && !(direction == Direction.INCOMING && endNode.equals(rel.getEndNode()));
         }
 
-        private boolean nextInPolygon(Relationship rel) {
-            return nextInPolygon(rel, relationId);
+        private boolean partOfPolyline(Relationship rel) {
+            return partOfPolyline(rel, relationId);
         }
 
-        static boolean nextInPolygon(Relationship rel, long relationId) {
+        static boolean partOfPolyline(Relationship rel, long relationId) {
             long[] ids = (long[]) rel.getProperty(Polygon.RELATION_OSM_IDS);
+
             for (long id : ids) {
                 if (id == relationId) {
                     return true;

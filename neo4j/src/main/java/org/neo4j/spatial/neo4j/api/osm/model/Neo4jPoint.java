@@ -1,14 +1,15 @@
-package org.neo4j.spatial.neo4j;
+package org.neo4j.spatial.neo4j.api.osm.model;
 
 import java.util.Arrays;
 
 import org.neo4j.graphdb.Node;
 import org.neo4j.spatial.core.CRS;
 import org.neo4j.spatial.core.Point;
+import org.neo4j.spatial.neo4j.api.osm.utils.CRSConverter;
 
 import static java.lang.String.format;
 
-class Neo4jPoint implements Point {
+public class Neo4jPoint implements Point {
     private final Node node;
 
     public Neo4jPoint(Node node) {

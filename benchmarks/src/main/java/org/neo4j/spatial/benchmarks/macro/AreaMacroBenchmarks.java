@@ -11,7 +11,7 @@ import org.neo4j.spatial.algo.wgs84.WGS84Area;
 import org.neo4j.spatial.benchmarks.JfrProfiler;
 import org.neo4j.spatial.core.MultiPolygon;
 import org.neo4j.spatial.core.Polygon;
-import org.neo4j.spatial.neo4j.UserDefinedFunctions;
+import org.neo4j.spatial.neo4j.api.osm.utils.OSMUtils;
 import org.neo4j.test.TestDatabaseManagementServiceBuilder;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -98,7 +98,7 @@ public class AreaMacroBenchmarks {
     public void testCartesianAreaGraph(Blackhole bh) {
         try (Transaction tx = db.beginTx()) {
             for (Node osmRelation : nodes) {
-                MultiPolygon polygon = UserDefinedFunctions.getGraphNodePolygon(osmRelation);
+                MultiPolygon polygon = OSMUtils.getGraphNodePolygon(osmRelation);
 
                 bh.consume(cartesianCalculator.area(polygon));
 
@@ -111,7 +111,7 @@ public class AreaMacroBenchmarks {
     public void testGeographicAreaGraph(Blackhole bh) {
         try (Transaction tx = db.beginTx()) {
             for (Node osmRelation : nodes) {
-                MultiPolygon polygon = UserDefinedFunctions.getGraphNodePolygon(osmRelation);
+                MultiPolygon polygon = OSMUtils.getGraphNodePolygon(osmRelation);
 
                 bh.consume(wgs84Calculator.area(polygon));
             }
@@ -124,7 +124,7 @@ public class AreaMacroBenchmarks {
         try {
             try (Transaction tx = db.beginTx()) {
                 for (Node osmRelation : nodes) {
-                    MultiPolygon polygon = UserDefinedFunctions.getArrayPolygon(osmRelation);
+                    MultiPolygon polygon = OSMUtils.getArrayPolygon(osmRelation);
 
                     bh.consume(cartesianCalculator.area(polygon));
                 }
@@ -140,7 +140,7 @@ public class AreaMacroBenchmarks {
     public void testGeographicAreaProperty(Blackhole bh) {
         try (Transaction tx = db.beginTx()) {
             for (Node osmRelation : nodes) {
-                MultiPolygon polygon = UserDefinedFunctions.getArrayPolygon(osmRelation);
+                MultiPolygon polygon = OSMUtils.getArrayPolygon(osmRelation);
 
                 bh.consume(wgs84Calculator.area(polygon));
             }

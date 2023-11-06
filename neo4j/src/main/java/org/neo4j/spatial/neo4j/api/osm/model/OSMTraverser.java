@@ -1,4 +1,4 @@
-package org.neo4j.spatial.neo4j;
+package org.neo4j.spatial.neo4j.api.osm.model;
 
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.spatial.Point;
@@ -7,8 +7,10 @@ import org.neo4j.spatial.algo.AlgoUtil;
 import org.neo4j.spatial.algo.wgs84.WGSUtil;
 import org.neo4j.spatial.core.Polygon;
 import org.neo4j.spatial.core.Vector;
+import org.neo4j.spatial.neo4j.api.osm.Relation;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class OSMTraverser {
 
@@ -24,7 +26,7 @@ public class OSMTraverser {
      */
     public static Pair<List<List<Node>>, List<List<Node>>> traverseOSMGraph(Transaction tx, Node main, double proximityThreshold) {
         List<List<Node>> wayNodes = collectWays(tx, main);
-        List<EnrichedWay> candidates = wayNodes.stream().map(EnrichedWay::new).toList();
+        List<EnrichedWay> candidates = wayNodes.stream().map(EnrichedWay::new).collect(Collectors.toList());
         int totalNodeCount = candidates.stream().mapToInt(EnrichedWay::size).sum();
         System.out.println("Found " + candidates.size() + " polygon/polyline candidates comprising " + totalNodeCount + " nodes from " + wayNodes.size() + " ways within " + main);
 

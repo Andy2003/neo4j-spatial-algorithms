@@ -16,6 +16,10 @@ import org.neo4j.kernel.api.procedure.GlobalProcedures;
 import org.neo4j.kernel.impl.traversal.MonoDirectionalTraversalDescription;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
 import org.neo4j.spatial.core.Polygon;
+import org.neo4j.spatial.neo4j.api.SpatialFunctions;
+import org.neo4j.spatial.neo4j.api.osm.OSMFunctions;
+import org.neo4j.spatial.neo4j.api.osm.OSMProcedures;
+import org.neo4j.spatial.neo4j.api.osm.Relation;
 import org.neo4j.test.TestDatabaseManagementServiceBuilder;
 import org.neo4j.values.storable.CoordinateReferenceSystem;
 import org.neo4j.values.storable.Values;
@@ -37,9 +41,18 @@ public class UserDefinedFunctionsTest {
     @Before
     public void setUp() throws KernelException {
         List<String> unrestricted = List.of("neo4j.*");
-        databases = new TestDatabaseManagementServiceBuilder().setConfig(GraphDatabaseSettings.procedure_unrestricted, unrestricted).setConfig(GraphDatabaseInternalSettings.trace_cursors, true).impermanent().build();
+        databases = new TestDatabaseManagementServiceBuilder()
+                .setConfig(GraphDatabaseSettings.procedure_unrestricted, unrestricted)
+                .setConfig(GraphDatabaseInternalSettings.trace_cursors, true)
+                .impermanent()
+                .build();
         db = databases.database(DEFAULT_DATABASE_NAME);
-        registerUDFClass(db, UserDefinedFunctions.class);
+        GlobalProcedures procedures = ((GraphDatabaseAPI) db)
+                .getDependencyResolver()
+                .resolveDependency(GlobalProcedures.class);
+        procedures.registerProcedure(OSMProcedures.class);
+        procedures.registerFunction(OSMFunctions.class);
+        procedures.registerFunction(SpatialFunctions.class);
     }
 
     @After
@@ -777,9 +790,4 @@ public class UserDefinedFunctionsTest {
         }
     }
 
-    private static void registerUDFClass(GraphDatabaseService db, Class<?> udfClass) throws KernelException {
-        GlobalProcedures procedures = ((GraphDatabaseAPI) db).getDependencyResolver().resolveDependency(GlobalProcedures.class);
-        procedures.registerProcedure(udfClass);
-        procedures.registerFunction(udfClass);
-    }
 }

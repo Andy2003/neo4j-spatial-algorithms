@@ -1,4 +1,4 @@
-package org.neo4j.spatial.neo4j;
+package org.neo4j.spatial.neo4j.api.osm.utils;
 
 import org.neo4j.spatial.core.CRS;
 import org.neo4j.values.storable.CoordinateReferenceSystem;
