@@ -116,6 +116,45 @@ Add the following repositories and dependency to your project's pom.xml:
 The version specified on the version line can be changed to match the version you wish to work with (based on the version of Neo4j itself you are using).
 To see which versions are available see the list at [Spatial Algorithms Releases](https://github.com/neo4j-contrib/m2/tree/master/releases/org/neo4j/spatial-algorithms-algo).
 
+## Defining complex multi polygon structure with nested holes and shells
+
+Nodes:
+- `Polygon`: Represents a polygon with a `shape` property of type List<Point> representing the shape of the polygon. A polygon can be a hole or a shell.
+
+Relationships:
+- `HAS_SHELL`: Indicates that a hole polygon has an inner shell
+- `HAS_HOLE`: Indicates that a shell polygon has an inner hole.
+
+**Example:**
+
+```cypher
+// Create the root node
+CREATE (root:ExampleRoot)
+
+// Create a polygon with a shell and points
+CREATE (root)-[:HAS_SHELL]->(p1:Polygon {shape: []})
+CREATE (root)-[:HAS_SHELL]->(p2:Polygon {shape: []})
+
+// Create a polygon with a hole and points
+CREATE (p1)-[:HAS_HOLE]->(h1:Polygon {shape: []})
+
+// Create a shell in a hole
+CREATE (h1)-[:HAS_SHELL]->(p3:Polygon {shape: []})
+```
+
+Adjust the `shape` property values as needed for each polygon.
+
+### Using the complex multi polygon structure in spatial functions
+
+Use the `spatial.parsePolygon` function to convert the complex multi polygon structure to List<List<Point>> array. This structure is used to recreate a `MultiPolygon` object for internal usage.
+
+**Example:**
+
+```cypher
+MATCH (root:ExampleRoot)
+RETURN spatial.boundingBox(spatial.parsePolygon(root)) as boundingBox
+```
+
 ## Making polygons in OSM data
 
 Working with OpenStreetMap data can be done using the instructions at https://github.com/neo4j-contrib/osm.

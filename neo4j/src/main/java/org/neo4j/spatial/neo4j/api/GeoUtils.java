@@ -7,6 +7,7 @@ import java.util.List;
 import org.neo4j.graphdb.spatial.CRS;
 import org.neo4j.graphdb.spatial.Coordinate;
 import org.neo4j.graphdb.spatial.Point;
+import org.neo4j.spatial.core.HasCRS;
 import org.neo4j.spatial.core.Polygon;
 import org.neo4j.spatial.neo4j.api.osm.utils.CRSConverter;
 
